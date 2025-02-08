@@ -14,7 +14,7 @@ namespace BusinesObjects
     public class ApplicationDBContext : IdentityDbContext<AppUser>
     {
 
-        public ApplicationDBContext(DbContextOptions dbContextOptions) :base(dbContextOptions)
+        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> dbContextOptions) :base(dbContextOptions)
         {
             
         }

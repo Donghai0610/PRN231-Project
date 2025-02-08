@@ -11,7 +11,7 @@ namespace BusinesObjects.Models
     {
 
         public string Image { get; set; } = string.Empty; 
-        public bool isActive { get; set; } = true;
+        public bool isActive { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     }
