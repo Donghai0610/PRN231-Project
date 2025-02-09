@@ -18,6 +18,21 @@ namespace BusinesObjects
         {
             
         }
+
+        public DbSet<Movie> Movies { get; set; }
+        public DbSet<Actor> Actors { get; set; }
+        public DbSet<BlogReview> BlogReviews { get; set; }
+        public DbSet<Gener> Categories { get; set; }
+        public DbSet<MovieGener> MovieCategories { get; set; }
+        public DbSet<WatchHistory> WatchHistories { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<PaymentMethod> PaymentMethods { get; set; }
+        public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
+
+        // Thêm DbSet cho Comment
+        public DbSet<Comment> Comments { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var builder = new ConfigurationBuilder()
