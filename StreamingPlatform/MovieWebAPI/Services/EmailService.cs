@@ -18,6 +18,18 @@ namespace MovieWebAPI.Services
             _emailTemplates = emailTemplates.Value;
         }
 
+        public async Task SendForgotPasswordEmailAsync(string userEmail, string userName, string resetLink)
+        {
+            var subject = "Password Reset Request";
+            var body = $"Hello {userName},\n\n" +
+                       "You requested to reset your password. Please click the link below to reset your password:\n" +
+                       $"{resetLink}\n\n" +
+                       "If you did not request a password reset, please ignore this email.";
+
+            // Gửi email qua SMTP
+            await SendEmailAsync(userEmail, subject, body);
+        }
+
         public async Task SendRegistrationEmailAsync(string userEmail, string userName, string activationLink)
         {
             // Lấy cấu hình từ EmailTemplates
@@ -64,6 +76,28 @@ namespace MovieWebAPI.Services
                 // Log lỗi chung nếu có
                 Console.WriteLine($"Error sending email: {ex.Message}");
             }
+        }
+
+        public async Task SendEmailAsync(string email, string subject, string message)
+        {
+            using var client = new SmtpClient(_smtpSettings.SmtpServer)
+            {
+                Port = _smtpSettings.Port,
+                Credentials = new NetworkCredential(_smtpSettings.UserName, _smtpSettings.Password),
+                EnableSsl = true
+            };
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(_smtpSettings.FromEmail),
+                Subject = subject,
+                Body = message,
+                IsBodyHtml = false
+            };
+
+            mailMessage.To.Add(email);
+
+            await client.SendMailAsync(mailMessage);
         }
 
     }

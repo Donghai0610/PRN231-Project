@@ -127,5 +127,58 @@ namespace MovieWebAPI.Controllers
                 return BadRequest("Email confirmation failed.");
             }
         }
+
+
+
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return BadRequest("Email not found.");
+            }
+
+            // Tạo Token cho việc reset mật khẩu
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            // Tạo liên kết với token để người dùng có thể click vào để reset mật khẩu
+            var resetLink = Url.Action("ResetPassword", "Account", new { token = token, email = request.Email }, Request.Scheme);
+
+            // Gửi email cho người dùng
+            await _emailService.SendForgotPasswordEmailAsync(user.Email, user.UserName, resetLink);
+
+            return Ok(new ResponseApiDTO<string>("Success", "Password reset link has been sent to your email.", null));
+        }
+
+
+
+
+
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDTO request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            // Kiểm tra thông tin email và token
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return BadRequest("Invalid request.");
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+
+            if (result.Succeeded)
+            {
+                return Ok(new ResponseApiDTO<string>("Success", "Password has been reset successfully.",null));
+            }
+
+            return BadRequest("Password reset failed.");
+        }
     }
 }
