@@ -38,7 +38,7 @@ namespace MovieWebAPI.Services
 
             try
             {
-                // Gửi email trong một thread riêng biệt (bất đồng bộ)
+               
                 await Task.Run(() =>
                 {
                     using var client = new SmtpClient(_smtpSettings.SmtpServer)

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,27 +10,29 @@ namespace BusinesObjects.Models
 {
     public class Movie
     {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public string Genre { get; set; }
-        public DateTime ReleaseDate { get; set; }
-        public string Image { get; set; }
-        public double Rating { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int MovieId { get; set; }
+        public string MovieName { get; set; }
+        public string? Description { get; set; }
+        public DateTime ReleaseDate { get; set; } = DateTime.Now;
+        public string? Image { get; set; }
 
-        // Mối quan hệ với diễn viên
-        public List<MovieActor> MovieActors { get; set; }
+        public bool isActive { get; set; } = false;
 
-        // Mối quan hệ với thể loại
-        public List<MovieGener> MovieCategories { get; set; }
+        // Quan hệ nhiều-nhiều với Genre thông qua MovieGenre
+        public ICollection<MovieGenre> MovieGenres { get; set; }
 
-        // Mối quan hệ với blog review
-        public List<BlogReview> BlogReviews { get; set; }
+        // Quan hệ với Actor
+        public ICollection<MovieActor> MovieActors { get; set; }
 
-        // Mối quan hệ với lịch sử xem phim
-        public List<WatchHistory> WatchHistories { get; set; }
+        // Quan hệ với Comment
+        public ICollection<Comment> Comments { get; set; }
 
-        // Mối quan hệ với bình luận
-        public List<Comment> Comments { get; set; }
+        // Quan hệ với Review
+        public ICollection<Review> Reviews { get; set; }
+
+        // Quan hệ với Blog
+        public ICollection<Blog> Blogs { get; set; }
     }
 }

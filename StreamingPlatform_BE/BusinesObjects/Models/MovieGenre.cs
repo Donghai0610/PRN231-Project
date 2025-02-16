@@ -8,22 +8,16 @@ using System.Threading.Tasks;
 
 namespace BusinesObjects.Models
 {
-    public class MovieActor
+    public class MovieGenre
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]  // Cấu hình Identity nếu cần
-        public int MovieActorId { get; set; }
+        public int MovieGenreId { get; set; }
 
         public int MovieId { get; set; }
         public Movie Movie { get; set; }
 
-        public int ActorId { get; set; }
-        public Actor Actor { get; set; }
-
-        public MovieActor()
-        {
-            Movie = new Movie();
-            Actor = new Actor();
-        }
+        public int GenreId { get; set; }
+        public Genre Genre { get; set; }
     }
 }

@@ -8,16 +8,16 @@ namespace BusinesObjects.Models
 {
     public class Comment
     {
-        public int Id { get; set; }
+        public int CommentId { get; set; }
         public string Content { get; set; }  // Nội dung bình luận
-        public DateTime CreatedAt { get; set; } = DateTime.Now;  // Thời gian bình luận
+        public DateTime DatePosted { get; set; } = DateTime.Now;  // Thời gian bình luận
 
         // Mối quan hệ với Movie
         public int MovieId { get; set; }
         public Movie Movie { get; set; }
 
         // Mối quan hệ với AppUser (người dùng)
-        public int UserId { get; set; }
-        public AppUser User { get; set; }
+        public string AppUserId { get; set; }  // Khóa ngoại đến AppUser (IdentityUser)
+        public AppUser AppUser { get; set; }
     }
 }

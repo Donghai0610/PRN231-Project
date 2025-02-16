@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MovieWebAPI.Helpers;
+using MovieWebAPI.Repository;
 using MovieWebAPI.Services;
 using MovieWebAPI.Services.IServices;
 
@@ -72,11 +73,21 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+
+});
+
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService,EmailService>();
+builder.Services.AddScoped<IGenreService,GenreService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<GenreRepository>();
 
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.Configure<EmailTemplates>(builder.Configuration.GetSection("EmailTemplates"));
+
 
 
 var app = builder.Build();
