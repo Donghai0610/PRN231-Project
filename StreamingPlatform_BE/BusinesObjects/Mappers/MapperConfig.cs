@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
-using BusinesObjects.Dtos.request;
+using BusinesObjects.Dtos.request.Actor;
+using BusinesObjects.Dtos.request.Auth;
 using BusinesObjects.Dtos.request.Genre;
-using BusinesObjects.Dtos.response;
+using BusinesObjects.Dtos.response.Actor;
+using BusinesObjects.Dtos.response.Auth;
 using BusinesObjects.Dtos.response.Genre;
 using BusinesObjects.Models;
 using System;
@@ -24,6 +26,10 @@ namespace BusinesObjects.Mappers
             CreateMap<Genre, NewGenreRequestDTO>().ReverseMap();
             CreateMap<Genre, UpdateGenreRequestDTO>().ReverseMap();
 
+            //Actor
+            CreateMap<Actor, ActorResponseDTO>().ReverseMap();
+            CreateMap<Actor, AddActorRequestDTO>().ReverseMap();
+            CreateMap<Actor, UpdateActorRequestDTO>().ReverseMap();
 
 
         }

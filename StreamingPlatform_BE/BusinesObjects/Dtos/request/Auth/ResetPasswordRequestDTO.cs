@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinesObjects.Dtos.request
+namespace BusinesObjects.Dtos.request.Auth
 {
     public class ResetPasswordRequestDTO
     {

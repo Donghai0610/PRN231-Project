@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinesObjects.Dtos.response
+namespace BusinesObjects.Dtos.response.Auth
 {
     public class ResponseApiDTO<T>
     {

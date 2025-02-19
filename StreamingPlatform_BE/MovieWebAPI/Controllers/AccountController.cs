@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using BusinesObjects.Dtos.request;
-using BusinesObjects.Dtos.response;
+using BusinesObjects.Dtos.request.Auth;
+using BusinesObjects.Dtos.response.Auth;
 using BusinesObjects.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

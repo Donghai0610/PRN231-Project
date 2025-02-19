@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinesObjects.Dtos.request
+namespace BusinesObjects.Dtos.request.Auth
 {
-   public class ForgotPasswordRequestDTO
+    public class LoginRequestDTO
     {
         [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+
+        public string UserName { get; set; }
+        [Required]
+        public string Password { get; set; }
     }
 }
