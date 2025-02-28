@@ -8,7 +8,7 @@ namespace MovieWebAPI.Services.IServices
     {
         Task<PagedResponse<ActorResponseDTO>> GetAllActorsAsync(UrlQueryParameters queryParameters);
         Task<ActorResponseDTO> GetActorByIdAsync(int actorId);
-        Task<ActorResponseDTO> AddActorAsync(AddActorRequestDTO actorDto);
+        Task<ActorResponseDTO> AddActorAsync(AddActorRequestDTO actorDto,IFormFile photo);
 
         Task<bool> UpdateActorAsync(UpdateActorRequestDTO actorDto);
         Task<bool> DeleteActorAsync(int actorId);

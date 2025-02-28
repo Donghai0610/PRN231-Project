@@ -22,6 +22,7 @@ namespace MovieWebAPI.Repository
             return actor; // Trả về Actor đã thêm vào
         }
 
+
         // Lấy tất cả Actor từ cơ sở dữ liệu
         public async Task<IEnumerable<Actor>> GetAllActorsAsync()
         {

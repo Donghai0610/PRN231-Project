@@ -12,10 +12,12 @@ namespace MovieWebAPI.Services
     {
         private readonly ActorRepository _actorRepository;
         private readonly IMapper _mapper;
-        public ActorService(ActorRepository actorRepository, IMapper mapper)
+        private readonly ICloudinaryService _cloudinaryService;
+        public ActorService(ActorRepository actorRepository, IMapper mapper, ICloudinaryService cloudinaryService)
         {
             _actorRepository = actorRepository;
             _mapper = mapper;
+            _cloudinaryService = cloudinaryService;
         }
         public async Task<PagedResponse<ActorResponseDTO>> GetAllActorsAsync(UrlQueryParameters queryParameters)
         {
@@ -52,7 +54,7 @@ namespace MovieWebAPI.Services
             return _mapper.Map<ActorResponseDTO>(actor);
         }
 
-        public async Task<ActorResponseDTO> AddActorAsync(AddActorRequestDTO actorDto)
+        public async Task<ActorResponseDTO> AddActorAsync(AddActorRequestDTO actorDto, IFormFile photo)
         {
             if (await _actorRepository.IsActorExistsAsync(actorDto.FullName))
             {
@@ -60,9 +62,18 @@ namespace MovieWebAPI.Services
             }
 
             var actor = _mapper.Map<Actor>(actorDto);
+
+            // Kiểm tra xem ảnh có được gửi không trước khi upload
+            if (photo != null)
+            {
+                var uploadResult = await _cloudinaryService.UploadPhoto(photo, $"actor/{actor.FullName}");
+                actor.Image = uploadResult.ToString();
+            }
+
             var addedActor = await _actorRepository.AddActorAsync(actor);
             return _mapper.Map<ActorResponseDTO>(addedActor);
         }
+
 
         public async Task<bool> UpdateActorAsync(UpdateActorRequestDTO actorDto)
         {

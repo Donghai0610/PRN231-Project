@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -20,6 +21,6 @@ namespace BusinesObjects.Dtos.request.Actor
         [Required(ErrorMessage = "Birth Date is required.")]
         public DateTime BirthDate { get; set; }
 
-        public string? Image { get; set; }
+        public IFormFile Image { get; set; }
     }
 }

@@ -1,0 +1,136 @@
+.carousel .carousel-inner {
+  display: flex;
+}
+
+.carousel-item {
+  flex: 0 0 100%;
+  transition: transform 0.6s ease-in-out !important;
+  position: relative;
+}
+
+.carousel-item-next,
+.carousel-item-start {
+  transform: translateX(0);
+}
+
+.carousel-item-prev,
+.carousel-item-end {
+  transform: translateX(-100%);
+}
+
+.carousel-item.active {
+  transform: translateX(0);
+  z-index: 1;
+  display: block;
+}
+
+.carousel-item {
+  height: 560px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.carousel-item img {
+  display: none;
+}
+.home-page-content {
+  color: #333;
+  margin: 3rem auto;
+  max-width: 1200px;
+}
+.navi {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.home-page-content .navi a {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 15px;
+  padding: 10px 20px;
+  border-bottom: 2px solid transparent;
+  transition: 0.3s;
+}
+
+.home-page-content .navi a:hover,
+.home-page-content .navi a.actived {
+  border-bottom: 2px solid #007bff;
+  color: #007bff;
+}
+
+.movie-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+  justify-items: start;
+}
+
+.movie-item {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  text-align: left;
+  padding: 15px;
+  position: relative;
+}
+
+.image-container {
+  position: relative;
+}
+
+.image-container img {
+  display: block;
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.overlay-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.image-container:hover .overlay-icon {
+  opacity: 1;
+}
+
+.movie-item a {
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.movie-item a:hover {
+  text-decoration: underline;
+}
+
+.movie-item h5 {
+  font-size: 18px;
+  color: #333;
+  margin: 10px 0;
+}
+.movie-item ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0 0;
+}
+
+.movie-item ul li {
+  margin-bottom: 5px;
+}
+
+.movie-item ul li span {
+  font-weight: bold;
+}
+
+.carousel-item img {
+  object-fit: contain;
+}

@@ -225,6 +225,10 @@ namespace BusinesObjects.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MovieUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
@@ -341,13 +345,13 @@ namespace BusinesObjects.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "c2e5fd40-36d1-4f37-b087-3c9773575325",
+                            Id = "4d57e662-a62d-41a1-8db6-e89f98b3e144",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "7ce7dbb7-50ce-46ad-bfe4-73e12543fda1",
+                            Id = "fe3df3be-56aa-4c41-9df9-89ab31da8a03",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });

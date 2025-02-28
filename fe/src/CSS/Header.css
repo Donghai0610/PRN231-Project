@@ -1,0 +1,71 @@
+.navbar .custom-nav .nav-link {
+  margin-left: 2rem;
+  margin-right: 2rem;
+  color: black;
+}
+.navbar .custom-nav .nav-link:hover,
+.navbar .custom-nav .nav-link.active {
+  color: #03599d;
+}
+
+.navbar #basic-navbar-nav {
+  margin-left: 20rem;
+}
+.nav-image img {
+  height: 6rem;
+  width: auto;
+  margin-right: 8px;
+}
+.Sig {
+  text-align: right;
+  font-size: 1rem;
+}
+.Sig a {
+  text-decoration: none;
+}
+.custom-nav .active-tab {
+  font-weight: bold;
+  color: #000;
+  border-bottom: 3px solid #000;
+}
+
+.dropdown-menu {
+  background-color: white !important;
+  border: none !important;
+  padding: 0;
+}
+
+.dropdown-item {
+  color: black !important;
+  padding: 10px 20px;
+  border-bottom: 1px solid #6c757d;
+}
+
+.dropdown-item:hover {
+  background-color: #495057 !important;
+  color: #ffffff !important;
+}
+
+.dropdown-divider {
+  border-top: 1px solid #6c757d; 
+}
+
+.navbar .dropdown-toggle {
+  color: black !important;
+}
+
+.dropdown-toggle::after {
+  color: black !important;
+}
+.fancy-font {
+  font-family: "Dancing Script", cursive;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap');
+
+.active-tab {
+  color: #007bff;
+  font-weight: bold;
+}
+

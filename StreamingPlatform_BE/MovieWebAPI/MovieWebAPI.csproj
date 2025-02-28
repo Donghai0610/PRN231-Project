@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+	  <PackageReference Include="CloudinaryDotNet" Version="1.27.3" />
+	  <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.2.0" />
   </ItemGroup>
 
   <ItemGroup>

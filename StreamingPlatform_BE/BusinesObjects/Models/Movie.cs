@@ -18,6 +18,7 @@ namespace BusinesObjects.Models
         public DateTime ReleaseDate { get; set; } = DateTime.Now;
         public string? Image { get; set; }
 
+        public string MovieUrl { get; set; }
         public bool isActive { get; set; } = false;
 
         // Quan hệ nhiều-nhiều với Genre thông qua MovieGenre

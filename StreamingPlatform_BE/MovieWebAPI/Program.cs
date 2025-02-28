@@ -3,11 +3,15 @@ using BusinesObjects;
 using BusinesObjects.Mappers;
 using BusinesObjects.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OData.ModelBuilder;
+using MovieWebAPI.Exceptions;
 using MovieWebAPI.Helpers;
 using MovieWebAPI.Repository;
 using MovieWebAPI.Services;
@@ -18,9 +22,9 @@ var mapperConfig = new MapperConfiguration( mc => mc.AddProfile(new MapperConfig
 IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
+var modelBuilder = new ODataConventionModelBuilder();
+modelBuilder.EntitySet<Movie>("Movies");
 
-
-// Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -48,6 +52,10 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 }).AddEntityFrameworkStores<ApplicationDBContext>()
 .AddDefaultTokenProviders();
 
+builder.Services.AddControllers().AddOData(options =>
+    options.Select().Filter().OrderBy().Count().Expand().SetMaxTop(100).AddRouteComponents(
+            "odata", modelBuilder.GetEdmModel())
+    );
 
 builder.Services.AddAuthentication(options =>
 {
@@ -78,17 +86,28 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
 
 });
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024;
+});
+
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService,EmailService>();
 builder.Services.AddScoped<IGenreService,GenreService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IActorService, ActorService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddScoped<IMovieService, MovieService>();
+
+builder.Services.AddScoped<MovieRepository>();
+builder.Services.AddScoped<ActorRepository>();
 builder.Services.AddScoped<GenreRepository>();
 
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.Configure<EmailTemplates>(builder.Configuration.GetSection("EmailTemplates"));
-
-
+builder.Services.AddExceptionHandler<GlobalExceptionHanlder>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
@@ -98,16 +117,23 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseHttpsRedirection();
 
+app.UseHttpsRedirection();
+app.UseRouting();
 app.UseCors(x => x.AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials()
                 .WithOrigins("http://localhost:3000")
                 .SetIsOriginAllowed(origin => true));
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers(); 
+});
 
 app.MapControllers();
 

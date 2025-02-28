@@ -66,9 +66,9 @@ namespace MovieWebAPI.Controllers
 
 
         // Thêm actor mới (Chỉ Admin được phép thực hiện)
-        [HttpPost]
-        [Authorize(Roles = "Admin")]  // Chỉ cho phép Admin truy cập
-        public async Task<IActionResult> AddActor([FromBody] AddActorRequestDTO actorDto, [FromHeader(Name = "Authorization")] string header)
+        [Authorize(Roles = "Admin")]
+        [HttpPost]// Chỉ cho phép Admin truy cập
+        public async Task<IActionResult> AddActor([FromForm] AddActorRequestDTO requestDTO, [FromHeader(Name = "Authorization")] string header)
         {
             // Kiểm tra tính hợp lệ của ModelState
             if (!ModelState.IsValid)
@@ -85,8 +85,13 @@ namespace MovieWebAPI.Controllers
 
             try
             {
+                if (requestDTO.Image == null)
+                    return BadRequest("Image is required!");
+
                 // Gọi service để thêm actor
-                var actor = await _actorService.AddActorAsync(actorDto);
+                var actor = await _actorService.AddActorAsync(requestDTO, requestDTO.Image);
+                if (actor == null)
+                    return BadRequest("Create Actor Fail");
 
                 // Trả về kết quả thành công
                 var actorResponseDTO = _mapper.Map<ActorResponseDTO>(actor);
