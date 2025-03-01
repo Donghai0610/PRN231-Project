@@ -22,8 +22,7 @@ namespace BusinesObjects.Models
 
         public MovieActor()
         {
-            Movie = new Movie();
-            Actor = new Actor();
+            
         }
     }
 }

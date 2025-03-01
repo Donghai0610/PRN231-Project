@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinesObjects.Dtos.request.Movie;
+using BusinesObjects.Dtos.response.Auth;
 using BusinesObjects.Dtos.response.Movie;
 using BusinesObjects.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -25,6 +26,9 @@ namespace MovieWebAPI.Controllers
             _mapper = mapper;
             _userService = userService;
         }
+
+
+
         [Authorize(Roles = "Admin,User")]
         [HttpGet]
         [EnableQuery]  // Kích hoạt OData query, cho phép phân trang, lọc, sắp xếp
@@ -61,16 +65,23 @@ namespace MovieWebAPI.Controllers
 
             try
             {
-                var movie = await _movieService.AddMovieAsync(requestDTO);
+                if (requestDTO.Image == null)
+                    return BadRequest("Image is required!");
+
+                var movie = await _movieService.AddMovieAsync(requestDTO, requestDTO.Image);
                 if (movie == null)
                     return BadRequest("Failed to create movie");
 
                 var movieResponseDTO = _mapper.Map<MovieResponseDTO>(movie);
-                return CreatedAtAction(nameof(GetMovieById), new { id = movie.MovieId }, movieResponseDTO);  // Trả về movie vừa tạo
+                if (movieResponseDTO == null)
+                    return BadRequest("Failed to create movie");
+                var resopnseApi = new ResponseApiDTO<MovieResponseDTO>("200", "Create Movie Successfully", movieResponseDTO);
+                return Ok(resopnseApi);
+                // Trả về movie vừa tạo
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);  // Trả về lỗi nếu có (ví dụ: phim đã tồn tại)
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {

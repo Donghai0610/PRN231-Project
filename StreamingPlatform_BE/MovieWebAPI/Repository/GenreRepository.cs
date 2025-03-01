@@ -52,6 +52,13 @@ namespace MovieWebAPI.Repository
             return !await _context.Genres.AnyAsync(g => g.Name == genreName);
             ;
         }
+        public async Task<List<int>> GetValidGenreIdsAsync(IEnumerable<int> genreIds)
+        {
+            return await _context.Genres
+                .Where(a => genreIds.Contains(a.GenreId))
+                .Select(a => a.GenreId)
+                .ToListAsync();
+        }
 
     }
 }

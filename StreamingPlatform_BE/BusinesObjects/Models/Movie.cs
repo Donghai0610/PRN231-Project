@@ -22,10 +22,10 @@ namespace BusinesObjects.Models
         public bool isActive { get; set; } = false;
 
         // Quan hệ nhiều-nhiều với Genre thông qua MovieGenre
-        public ICollection<MovieGenre> MovieGenres { get; set; }
+        public ICollection<MovieGenre> MovieGenres { get; set; } = new List<MovieGenre>();
 
         // Quan hệ với Actor
-        public ICollection<MovieActor> MovieActors { get; set; }
+        public ICollection<MovieActor> MovieActors { get; set; } = new List<MovieActor>();
 
         // Quan hệ với Comment
         public ICollection<Comment> Comments { get; set; }

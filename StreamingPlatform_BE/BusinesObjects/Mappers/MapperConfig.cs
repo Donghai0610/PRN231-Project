@@ -29,12 +29,15 @@ namespace BusinesObjects.Mappers
             CreateMap<Genre, UpdateGenreRequestDTO>().ReverseMap();
 
             //Actor
-            CreateMap<AddActorRequestDTO,Actor>().ForMember(dest => dest.Image,opt => opt.Ignore()).ReverseMap();
-            CreateMap<Actor, UpdateActorRequestDTO>().ReverseMap();
+            CreateMap<AddActorRequestDTO,Actor>().ForMember(dest => dest.Image,opt => opt.Ignore())
+                .ReverseMap();
+            CreateMap<UpdateActorRequestDTO, Actor>().ReverseMap();
 
-            CreateMap<Actor, ActorResponseDTO>().ReverseMap();
+            CreateMap<Actor, ActorResponseDTO>()
+                     .ForMember(dest => dest.Movies,
+                         opt => opt.MapFrom(src => src.MovieActors.Select(ma => ma.Movie))).ReverseMap();
 
-
+            CreateMap<Actor, MovieActorResponseDTO>().ReverseMap();
             //Movie
             // Movie Mapping
             CreateMap<AddMovieRequestDTO, Movie>()
@@ -50,12 +53,15 @@ namespace BusinesObjects.Mappers
                 .ReverseMap();
 
             CreateMap<Movie, MovieResponseDTO>()
-                .ForMember(dest => dest.Actors, opt => opt.MapFrom(src => src.MovieActors))
-                .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.MovieGenres))
+                  .ForMember(dest => dest.Actors, opt => opt.MapFrom(src => src.MovieActors.Select(ma => ma.Actor)))
+                 .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.MovieGenres.Select(mg => mg.Genre)))
                 .ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.Comments))
                 .ForMember(dest => dest.Reviews, opt => opt.MapFrom(src => src.Reviews))
                 .ReverseMap();
 
+
+            CreateMap<Movie, ActorMovieResponseDTO>().ReverseMap();
+            
         }
 
     }

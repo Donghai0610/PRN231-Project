@@ -13,14 +13,12 @@ namespace BusinesObjects.Dtos.request.Actor
         [Required(ErrorMessage = "ActorId is required.")]
         public int ActorId { get; set; }
 
-        [Required(ErrorMessage = "Full Name is required.")]
-        public string FullName { get; set; }
+        public string? FullName { get; set; }
 
         public string? Bio { get; set; }
 
-        [Required(ErrorMessage = "Birth Date is required.")]
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
 
-        public IFormFile Image { get; set; }
+        public IFormFile? Image { get; set; }
     }
 }

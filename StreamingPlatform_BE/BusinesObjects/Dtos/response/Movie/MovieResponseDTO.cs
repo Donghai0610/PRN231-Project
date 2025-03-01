@@ -20,7 +20,7 @@ namespace BusinesObjects.Dtos.response.Movie
         public string Image { get; set; }
 
         public string MovieUrl { get; set; }
-        public List<ActorResponseDTO> Actors { get; set; }
+        public List<MovieActorResponseDTO> Actors { get; set; }
         public List<GenreResponseDTO> Genres { get; set; }
 
         public List<CommentResponseDTO> Comments { get; set; }

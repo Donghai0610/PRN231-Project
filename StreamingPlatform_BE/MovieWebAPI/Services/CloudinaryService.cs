@@ -25,21 +25,28 @@ namespace MovieWebAPI.Services
         }
         public async Task<string> UploadPhoto(IFormFile photo, string folderName)
         {
-            var uploadResult = new ImageUploadResult();
-
-            if (photo.Length > 0)
+            if (photo == null || photo.Length == 0)
             {
-                await using var stream = photo.OpenReadStream();
-                var uploadParams = new ImageUploadParams()
-                {
-                    File = new FileDescription(photo.Name, stream),
-                    Folder = folderName
-                };
-
-                uploadResult = _cloudinary.Upload(uploadParams);
+                throw new ArgumentException("Invalid photo file");
             }
 
-            return uploadResult.SecureUrl.ToString();
+            var uploadResult = new ImageUploadResult();
+
+            await using var stream = photo.OpenReadStream();
+            var uploadParams = new ImageUploadParams
+            {
+                File = new FileDescription(photo.FileName, stream),
+                Folder = folderName
+            };
+
+            uploadResult = _cloudinary.Upload(uploadParams);
+
+            if (uploadResult.Error != null)
+            {
+                throw new Exception($"Cloudinary upload error: {uploadResult.Error.Message}");
+            }
+
+            return uploadResult.SecureUrl?.ToString() ?? throw new Exception("Upload failed: SecureUrl is null");
         }
     }
 }

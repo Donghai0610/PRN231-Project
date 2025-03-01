@@ -20,11 +20,18 @@ namespace MovieWebAPI.Repository
             return movie;
         }
 
-       
+
         // Lấy danh sách tất cả các bộ phim
         public async Task<List<Movie>> GetMoviesAsync()
         {
-            return await _context.Movies.ToListAsync();
+            return await _context.Movies
+                 .Include(m => m.MovieGenres)
+                 .ThenInclude(ma=> ma.Genre)
+                 .Include(m => m.MovieActors)
+                     .ThenInclude(ma => ma.Actor)
+                 .Include(m => m.Comments)
+                 .Include(m => m.Reviews)
+                 .ToListAsync();
         }
 
         // Lấy chi tiết một bộ phim theo MovieId
@@ -62,8 +69,11 @@ namespace MovieWebAPI.Repository
         public async Task<bool> CheckMovieExistsByNameAsync(string movieName)
         {
             var movieExists = await _context.Movies
-                .AnyAsync(m => m.MovieName.Equals(movieName, StringComparison.OrdinalIgnoreCase)); // Kiểm tra không phân biệt chữ hoa chữ thường
+                .AnyAsync(m => m.MovieName.Equals(movieName));
             return movieExists;
         }
+
+
+
     }
 }

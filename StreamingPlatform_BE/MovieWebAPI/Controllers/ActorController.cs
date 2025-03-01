@@ -110,10 +110,9 @@ namespace MovieWebAPI.Controllers
             }
         }
 
-        // Cập nhật actor (Chỉ Admin được phép thực hiện)
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]  // Chỉ cho phép Admin truy cập
-        public async Task<IActionResult> UpdateActor(int id, [FromBody] UpdateActorRequestDTO actorDto, [FromHeader(Name = "Authorization")] string header)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateActor(int id, [FromForm] UpdateActorRequestDTO actorDto, [FromHeader(Name = "Authorization")] string header)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -130,18 +129,18 @@ namespace MovieWebAPI.Controllers
             {
                 var result = await _actorService.UpdateActorAsync(actorDto);
                 if (!result) return NotFound("Actor not found");
+                
+                var actor = await _actorService.GetActorByIdAsync(id);
 
-                var response = new ResponseApiDTO<UpdateActorRequestDTO>("success", "Update actor successfully", actorDto);
+                var response = new ResponseApiDTO<ActorResponseDTO>("success", "Update actor successfully", actor);
                 return Ok(response);
             }
             catch (ArgumentException ex)
             {
-                // Trả về BadRequest nếu actor đã tồn tại
-                return BadRequest(ex.Message);  // Trả về thông điệp lỗi từ exception (Actor already exists)
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
-                // Bắt các lỗi khác và trả về lỗi chung
                 return StatusCode(500, new { message = "An error occurred while updating the actor.", details = ex.Message });
             }
         }

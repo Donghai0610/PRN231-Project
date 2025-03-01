@@ -32,7 +32,10 @@ namespace MovieWebAPI.Repository
         // Lấy Actor theo ID
         public async Task<Actor> GetActorByIdAsync(int actorId)
         {
-            return await _context.Actors.FirstOrDefaultAsync(a => a.ActorId == actorId);
+            return await _context.Actors
+                  .Include(a => a.MovieActors)
+                  .ThenInclude(ma => ma.Movie)
+                .FirstOrDefaultAsync(a => a.ActorId == actorId);
         }
 
         // Cập nhật Actor trong cơ sở dữ liệu
@@ -46,19 +49,44 @@ namespace MovieWebAPI.Repository
         // Xóa Actor khỏi cơ sở dữ liệu
         public async Task<bool> DeleteActorAsync(int actorId)
         {
-            var actor = await GetActorByIdAsync(actorId);
-            if (actor == null) return false;
+            // Lấy Actor kèm MovieActors
+            var actor = await _context.Actors
+                .Include(a => a.MovieActors)
+                .FirstOrDefaultAsync(a => a.ActorId == actorId);
 
+            if (actor == null)
+            {
+                return false; // Không tìm thấy Actor
+            }
+
+            // Xóa các dòng liên kết trong MovieActor
+            if (actor.MovieActors != null && actor.MovieActors.Any())
+            {
+                _context.MovieActors.RemoveRange(actor.MovieActors);
+            }
+
+            // Cuối cùng xóa Actor
             _context.Actors.Remove(actor);
+
+            // Lưu thay đổi
             var result = await _context.SaveChangesAsync();
-            return result > 0; // Trả về true nếu xóa thành công
+            return result > 0;
         }
+
 
         // Kiểm tra xem Actor có tồn tại trong cơ sở dữ liệu hay không (theo tên)
         public async Task<bool> IsActorExistsAsync(string name)
         {
             return await _context.Actors.AnyAsync(a => a.FullName == name);
 
+        }
+
+        public async Task<List<int>> GetValidActorIdsAsync(IEnumerable<int> actorIds)
+        {
+            return await _context.Actors
+                .Where(a => actorIds.Contains(a.ActorId))
+                .Select(a => a.ActorId)
+                .ToListAsync();
         }
     }
 }

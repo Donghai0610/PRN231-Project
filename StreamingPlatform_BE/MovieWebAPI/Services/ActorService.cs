@@ -77,9 +77,41 @@ namespace MovieWebAPI.Services
 
         public async Task<bool> UpdateActorAsync(UpdateActorRequestDTO actorDto)
         {
-            var actor = _mapper.Map<Actor>(actorDto);
-            return await _actorRepository.UpdateActorAsync(actor);
+            // Lấy actor hiện tại từ DB
+            var existingActor = await _actorRepository.GetActorByIdAsync(actorDto.ActorId);
+            if (existingActor == null)
+            {
+                throw new ArgumentException("Actor not found.");
+            }
+
+            // Cập nhật các trường chỉ khi giá trị được gửi (không null hoặc, đối với chuỗi, không rỗng)
+            if (!string.IsNullOrWhiteSpace(actorDto.FullName))
+            {
+                existingActor.FullName = actorDto.FullName;
+            }
+
+            // Nếu Bio được gửi (có thể rỗng được chấp nhận tùy nghiệp vụ)
+            if (actorDto.Bio != null)
+            {
+                existingActor.Bio = actorDto.Bio;
+            }
+
+            if (actorDto.BirthDate.HasValue)
+            {
+                existingActor.BirthDate = actorDto.BirthDate;
+            }
+
+            // Cập nhật hình ảnh nếu có file mới được gửi
+            if (actorDto.Image != null)
+            {
+                var uploadResult = await _cloudinaryService.UploadPhoto(actorDto.Image, $"actor/{existingActor.FullName}");
+                existingActor.Image = uploadResult.ToString();
+            }
+
+            // Gọi repository cập nhật lại actor (lưu ý: phương thức này nên đảm bảo cập nhật entity đã có)
+            return await _actorRepository.UpdateActorAsync(existingActor);
         }
+
 
         public async Task<bool> DeleteActorAsync(int actorId)
         {

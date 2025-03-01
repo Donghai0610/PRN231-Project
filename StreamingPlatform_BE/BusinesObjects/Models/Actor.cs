@@ -13,9 +13,9 @@ namespace BusinesObjects.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ActorId { get; set; }
-        public string FullName { get; set; }
+        public string? FullName { get; set; }
         public string? Bio { get; set; }
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
         public string? Image { get; set; }
 
         public ICollection<MovieActor> MovieActors { get; set; } = new List<MovieActor>(); // Khởi tạo giá trị mặc định

@@ -16,7 +16,7 @@ namespace BusinesObjects.Dtos.request.Actor
         public string? Bio { get; set; }
 
         [Required(ErrorMessage = "Birth Date is required.")]
-        public DateTime BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
 
         [Required]
         public IFormFile Image { get; set; }

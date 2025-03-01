@@ -2,6 +2,7 @@
 using BusinesObjects.Dtos.request.Movie;
 using BusinesObjects.Dtos.response.Movie;
 using BusinesObjects.Models;
+using Microsoft.EntityFrameworkCore;
 using MovieWebAPI.Repository;
 using MovieWebAPI.Services.IServices;
 
@@ -12,16 +13,20 @@ namespace MovieWebAPI.Services
         private readonly MovieRepository _movieRepository;
         private readonly IMapper _mapper;
         private readonly ICloudinaryService _cloudinaryService;  // Inject CloudinaryService
+        private readonly ActorRepository actorRepository;
+        private readonly GenreRepository genreRepository;
 
-        public MovieService(MovieRepository movieRepository, IMapper mapper, ICloudinaryService cloudinaryService)
+        public MovieService(MovieRepository movieRepository, IMapper mapper, ICloudinaryService cloudinaryService, ActorRepository actorRepository, GenreRepository genreRepository)
         {
             _movieRepository = movieRepository;
             _mapper = mapper;
             _cloudinaryService = cloudinaryService;  // Initialize CloudinaryService
+            this.actorRepository = actorRepository;
+            this.genreRepository = genreRepository;
         }
 
         // Thêm bộ phim mới
-        public async Task<MovieResponseDTO> AddMovieAsync(AddMovieRequestDTO request)
+        public async Task<MovieResponseDTO> AddMovieAsync(AddMovieRequestDTO request, IFormFile photo)
         {
             // Kiểm tra phim có tồn tại không
             bool movieExists = await _movieRepository.CheckMovieExistsByNameAsync(request.MovieName);
@@ -34,9 +39,11 @@ namespace MovieWebAPI.Services
             var movie = _mapper.Map<Movie>(request);
 
             // Nếu có ảnh, tải lên Cloudinary và lưu lại URL
-            if (request.Image != null)
+            if (photo != null)
             {
-                movie.Image = await _cloudinaryService.UploadPhoto(request.Image, $"actor/{request.MovieName}"); 
+                var uploadResult = await _cloudinaryService.UploadPhoto(photo, $"actor/{movie.MovieName}");
+
+                movie.Image = uploadResult.ToString();
             }
 
             // Lưu phim vào cơ sở dữ liệu
@@ -100,35 +107,77 @@ namespace MovieWebAPI.Services
         // Thêm diễn viên và thể loại cho phim (Phương thức này sẽ được sử dụng trong các phương thức khác)
         private async Task AddActorsAndGenresAsync(Movie movie, AddMovieRequestDTO request)
         {
-            // Thêm diễn viên vào bộ phim
-            if (request.ActorIds != null && request.ActorIds.Any())
+            try
             {
-                foreach (var actorId in request.ActorIds)
+                // Lấy danh sách ActorIds hợp lệ
+                if (request.ActorIds != null && request.ActorIds.Any())
                 {
-                    var movieActor = new MovieActor
+                    var validActorIds = await actorRepository.GetValidActorIdsAsync(request.ActorIds);
+                    var invalidActorIds = request.ActorIds.Except(validActorIds).ToList();
+                    if (invalidActorIds.Any())
                     {
-                        MovieId = movie.MovieId,
-                        ActorId = actorId
-                    };
-                    movie.MovieActors.Add(movieActor);
-                }
-            }
+                        throw new Exception($"These Actor IDs do not exist: {string.Join(", ", invalidActorIds)}");
+                    }
 
-            // Thêm thể loại vào bộ phim
-            if (request.GenreIds != null && request.GenreIds.Any())
+                    // Đảm bảo MovieActors không null
+                    if (movie.MovieActors == null)
+                        movie.MovieActors = new List<MovieActor>();
+
+                    foreach (var actorId in validActorIds)
+                    {
+                        var movieActor = new MovieActor
+                        {
+                            MovieId = movie.MovieId,
+                            ActorId = actorId
+                        };
+                        movie.MovieActors.Add(movieActor);
+                    }
+                }
+
+                // Tương tự cho Genre
+                if (request.GenreIds != null && request.GenreIds.Any())
+                {
+                    var validGenreIds = await genreRepository.GetValidGenreIdsAsync(request.GenreIds);
+                    var invalidGenreIds = request.GenreIds.Except(validGenreIds).ToList();
+                    if (invalidGenreIds.Any())
+                    {
+                        throw new Exception($"These Genre IDs do not exist: {string.Join(", ", invalidGenreIds)}");
+                    }
+
+                    if (movie.MovieGenres == null)
+                        movie.MovieGenres = new List<MovieGenre>();
+
+                    foreach (var genreId in validGenreIds)
+                    {
+                        var movieGenre = new MovieGenre
+                        {
+                            MovieId = movie.MovieId,
+                            GenreId = genreId
+                        };
+                        movie.MovieGenres.Add(movieGenre);
+                    }
+                }
+
+                // Cuối cùng, update lại Movie
+                await _movieRepository.UpdateMovieAsync(movie);
+            }
+            catch (DbUpdateException dbEx)
             {
-                foreach (var genreId in request.GenreIds)
-                {
-                    var movieGenre = new MovieGenre
-                    {
-                        MovieId = movie.MovieId,
-                        GenreId = genreId
-                    };
-                    movie.MovieGenres.Add(movieGenre);
-                }
-            }
+                // Lấy chi tiết lỗi gốc
+                var baseException = dbEx.GetBaseException();
 
-            await _movieRepository.UpdateMovieAsync(movie);  // Cập nhật lại bộ phim với diễn viên và thể loại
+                // Gộp message của EF + message gốc
+                var errorMessage = $"Error in AddActorsAndGenresAsync: {dbEx.Message}. Details: {baseException.Message}";
+
+                // Ném (throw) lại hoặc log, tuỳ bạn
+                throw new Exception(errorMessage, dbEx);
+            }
+            catch (Exception ex)
+            {
+                // Bắt các lỗi khác (nếu có)
+                throw new Exception($"Error in AddActorsAndGenresAsync: {ex.Message}", ex);
+            }
         }
+
     }
 }
