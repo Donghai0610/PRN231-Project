@@ -29,7 +29,7 @@ namespace BusinesObjects.Mappers
             CreateMap<Genre, UpdateGenreRequestDTO>().ReverseMap();
 
             //Actor
-            CreateMap<AddActorRequestDTO,Actor>().ForMember(dest => dest.Image,opt => opt.Ignore())
+            CreateMap<AddActorRequestDTO, Actor>().ForMember(dest => dest.Image, opt => opt.Ignore())
                 .ReverseMap();
             CreateMap<UpdateActorRequestDTO, Actor>().ReverseMap();
 
@@ -49,7 +49,8 @@ namespace BusinesObjects.Mappers
             CreateMap<UpdateMovieRequestDTO, Movie>()
                 .ForMember(dest => dest.MovieGenres, opt => opt.Ignore())  // Bỏ qua ánh xạ MovieGenres
                 .ForMember(dest => dest.MovieActors, opt => opt.Ignore())  // Bỏ qua ánh xạ MovieActors
-                .ForMember(dest => dest.Image, opt => opt.Ignore())  // Bỏ qua trường Image (được xử lý riêng biệt)
+                .ForMember(dest => dest.Image, opt => opt.Ignore())
+                 .ForMember(dest => dest.isActive, opt => opt.Ignore())// Bỏ qua trường Image (được xử lý riêng biệt)
                 .ReverseMap();
 
             CreateMap<Movie, MovieResponseDTO>()
@@ -61,7 +62,7 @@ namespace BusinesObjects.Mappers
 
 
             CreateMap<Movie, ActorMovieResponseDTO>().ReverseMap();
-            
+
         }
 
     }

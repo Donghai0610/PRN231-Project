@@ -92,32 +92,50 @@ namespace MovieWebAPI.Controllers
         // Cập nhật movie (Chỉ Admin được phép thực hiện)
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMovie(int id, [FromBody] UpdateMovieRequestDTO requestDTO, [FromHeader(Name = "Authorization")] string header)
+        public async Task<IActionResult> UpdateMovie(int id, [FromForm] UpdateMovieRequestDTO requestDTO, [FromHeader(Name = "Authorization")] string header)
         {
+            // Validate token và xác thực user
             var user = await ValidateToken(header);
             if (user == null)
-                return Unauthorized("User not found or token is invalid!");
+            {
+                return Unauthorized(new { message = "User not found or token is invalid!" });
+            }
 
+            // Kiểm tra sự khớp giữa ID trong URL và ID trong DTO
             if (id != requestDTO.MovieId)
-                return BadRequest("Movie ID mismatch");
+            {
+                return BadRequest(new { message = "Movie ID mismatch" });
+            }
 
             try
             {
+                // Gọi service để cập nhật movie
                 var updatedMovie = await _movieService.UpdateMovieAsync(id, requestDTO);
-                if (updatedMovie == null)
-                    return NotFound("Movie not found");
 
-                return Ok(updatedMovie);  // Trả về movie đã cập nhật
+                if (updatedMovie == null)
+                {
+                    return NotFound(new { message = "Movie not found" });
+                }
+
+                // Map movie đã cập nhật sang MovieResponseDTO
+                var movieResponseDTO = _mapper.Map<MovieResponseDTO>(updatedMovie);
+
+                // Tạo Response DTO cho API
+                var responseApi = new ResponseApiDTO<MovieResponseDTO>("200", "Update Movie Successfully", movieResponseDTO);
+
+                return Ok(responseApi);  // Trả về movie đã được cập nhật
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);  // Trả về lỗi nếu có (ví dụ: phim không tồn tại)
+                return BadRequest(new { message = ex.Message });  // Trả về lỗi nếu có, ví dụ: Movie không tồn tại
             }
             catch (Exception ex)
             {
+                // Log chi tiết lỗi hoặc theo dõi thêm tại server
                 return StatusCode(500, new { message = "An error occurred while updating the movie.", details = ex.Message });
             }
         }
+
 
         // Xóa movie (Chỉ Admin được phép thực hiện)
         [Authorize(Roles = "Admin")]
@@ -141,6 +159,31 @@ namespace MovieWebAPI.Controllers
                 return StatusCode(500, new { message = "An error occurred while deleting the movie.", details = ex.Message });
             }
         }
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}/activate")]
+        public async Task<IActionResult> ActivateMovie(int id, [FromBody] bool isActive, [FromHeader(Name = "Authorization")] string header)
+        {
+            var user = await ValidateToken(header);
+            if (user == null)
+                return Unauthorized("User not found or token is invalid!");
+            try
+            {
+                // Gọi service để cập nhật trạng thái của movie
+                var result = await _movieService.UpdateMovieStatusAsync(id, isActive);
+
+                if (!result)
+                {
+                    return NotFound(new { message = "Movie not found" });
+                }
+
+                return Ok(new { message = "Movie status updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred", details = ex.Message });
+            }
+        }
+
 
         // Phương thức để xác thực token và lấy user
         private async Task<AppUser> ValidateToken(string header)
@@ -152,6 +195,7 @@ namespace MovieWebAPI.Controllers
             var user = await _userService.GetUserFromToken(token);
             return user;  // Nếu user không tồn tại, trả về null
         }
+
     }
 }
 

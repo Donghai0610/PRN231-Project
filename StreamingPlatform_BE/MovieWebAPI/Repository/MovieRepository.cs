@@ -26,7 +26,7 @@ namespace MovieWebAPI.Repository
         {
             return await _context.Movies
                  .Include(m => m.MovieGenres)
-                 .ThenInclude(ma=> ma.Genre)
+                 .ThenInclude(ma => ma.Genre)
                  .Include(m => m.MovieActors)
                      .ThenInclude(ma => ma.Actor)
                  .Include(m => m.Comments)
@@ -39,7 +39,9 @@ namespace MovieWebAPI.Repository
         {
             return await _context.Movies
                 .Include(m => m.MovieGenres)
-                .Include(m => m.MovieActors)
+                .ThenInclude(ma => ma.Genre)
+                .Include(m => m.MovieActors).
+                    ThenInclude(ma => ma.Actor)
                 .Include(m => m.Comments)
                 .Include(m => m.Reviews)
                 .FirstOrDefaultAsync(m => m.MovieId == movieId);
@@ -74,6 +76,24 @@ namespace MovieWebAPI.Repository
         }
 
 
+        public async Task<bool> UpdateMovieStatusAsync(int movieId, bool isActive)
+        {
+            // Lấy movie theo movieId
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.MovieId == movieId);
+            if (movie == null)
+            {
+                return false; // Movie không tìm thấy
+            }
+
+            // Cập nhật trường isActive
+            movie.isActive = isActive;
+
+            // Lưu thay đổi
+            _context.Movies.Update(movie);
+            var result = await _context.SaveChangesAsync();
+
+            return result > 0; // Trả về true nếu lưu thành công
+        }
 
     }
 }

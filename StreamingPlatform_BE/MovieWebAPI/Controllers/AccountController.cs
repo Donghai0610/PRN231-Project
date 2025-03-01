@@ -158,27 +158,34 @@ namespace MovieWebAPI.Controllers
 
 
 
-
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDTO request)
+        public async Task<IActionResult> ResetPassword([FromQuery] string token, [FromQuery] string email, [FromBody] ResetPasswordRequestDTO request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
+            {
+                return BadRequest("Token or email is missing.");
+            }
 
             // Kiểm tra thông tin email và token
-            var user = await _userManager.FindByEmailAsync(request.Email);
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 return BadRequest("Invalid request.");
             }
 
-            var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+            // Gọi ResetPasswordAsync để reset mật khẩu
+            var result = await _userManager.ResetPasswordAsync(user, token, request.NewPassword);
 
             if (result.Succeeded)
             {
-                return Ok(new ResponseApiDTO<string>("Success", "Password has been reset successfully.",null));
+                return Ok(new ResponseApiDTO<string>("Success", "Password has been reset successfully.", null));
             }
 
-            return BadRequest("Password reset failed.");
+            // Nếu reset thất bại, in ra lỗi cụ thể từ result.Errors
+            var errorMessages = result.Errors.Select(e => e.Description).ToList();
+            return BadRequest(new ResponseApiDTO<string>("Error", "Password reset failed.", string.Join(", ", errorMessages)));
         }
+
+
     }
 }

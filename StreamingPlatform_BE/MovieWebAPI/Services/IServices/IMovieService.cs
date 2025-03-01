@@ -10,6 +10,7 @@ namespace MovieWebAPI.Services.IServices
         Task<MovieResponseDTO> GetMovieDetailAsync(int movieId);
         Task<MovieResponseDTO> UpdateMovieAsync(int movieId, UpdateMovieRequestDTO request);
         Task<MovieResponseDTO> DeleteMovieAsync(int movieId);
+        Task<bool> UpdateMovieStatusAsync(int movieId, bool isActive);
 
     }
 }
