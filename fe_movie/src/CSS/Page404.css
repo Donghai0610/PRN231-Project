@@ -1,0 +1,40 @@
+.container-page404 {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.container-page404 .error-message {
+  background-color: #fff;
+  padding: 50px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.container-page404 h1 {
+  font-size: 120px;
+  color: #e74c3c;
+}
+
+.container-page404 p {
+  font-size: 18px;
+  color: #555;
+  margin: 20px 0;
+}
+
+.container-page404 .home-link {
+  font-size: 16px;
+  color: #3498db;
+  text-decoration: none;
+}
+
+.container-page404 .home-link:hover {
+  text-decoration: underline;
+}
