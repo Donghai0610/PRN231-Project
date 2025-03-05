@@ -94,6 +94,12 @@ namespace MovieWebAPI.Repository
 
             return result > 0; // Trả về true nếu lưu thành công
         }
+        public async Task<List<Movie>> GetAllMoviesWithBlogsAsync()
+        {
+            return await _context.Movies
+                .Include(m => m.Blogs)  // Bao gồm các Blog liên quan đến Movie
+                .ToListAsync();
+        }
 
     }
 }

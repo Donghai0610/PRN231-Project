@@ -38,7 +38,7 @@ namespace MovieWebAPI.Controllers
         }
 
         // Lấy tất cả actor (Chỉ Admin được phép thực hiện)
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Customer")]
         [HttpGet]
         public async Task<IActionResult> GetAllActors([FromQuery] UrlQueryParameters queryParameters, [FromHeader(Name = "Authorization")] string header)
         {

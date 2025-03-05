@@ -1,4 +1,5 @@
 ﻿using BusinesObjects.Models;
+using Microsoft.AspNetCore.OData.Query;
 using System.Threading.Tasks;
 
 namespace MovieWebAPI.Services.IServices
@@ -8,5 +9,10 @@ namespace MovieWebAPI.Services.IServices
         Task<AppUser> GetUserFromToken(string token);
 
         Task<bool> HasRole(AppUser user, string role);
+
+
+        Task<IEnumerable<AppUser>> GetAllUsersAsync(ODataQueryOptions<AppUser> queryOptions);
+        Task<AppUser> GetUserDetailAsync(string userId);
+        Task<bool> UpdateIsActiveAsync(string userId, bool isActive);
     }
 }

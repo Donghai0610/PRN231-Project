@@ -24,6 +24,8 @@ builder.Services.AddSingleton(mapper);
 
 var modelBuilder = new ODataConventionModelBuilder();
 modelBuilder.EntitySet<Movie>("Movies");
+modelBuilder.EntitySet<Blog>("Blog");
+modelBuilder.EntitySet<AppUser>("User");
 
 
 builder.Services.AddControllers();
@@ -84,6 +86,9 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("Customer", policy => policy.RequireRole("Customer"));
+    options.AddPolicy("AdminOrCustomer", policy =>
+       policy.RequireRole("Admin", "Customer"));
 
 });
 builder.Services.Configure<FormOptions>(options =>
@@ -99,10 +104,12 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IActorService, ActorService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IMovieService, MovieService>();
-
+builder.Services.AddScoped<IBlogService, BlogService>();
+builder.Services.AddScoped<BlogRepository>();
 builder.Services.AddScoped<MovieRepository>();
 builder.Services.AddScoped<ActorRepository>();
 builder.Services.AddScoped<GenreRepository>();
+builder.Services.AddScoped<UserRepository>();
 
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.Configure<EmailTemplates>(builder.Configuration.GetSection("EmailTemplates"));

@@ -29,18 +29,31 @@ namespace MovieWebAPI.Controllers
 
 
 
-        [Authorize(Roles = "Admin,User")]
+        
         [HttpGet]
-        [EnableQuery]  // Kích hoạt OData query, cho phép phân trang, lọc, sắp xếp
-        public async Task<IActionResult> GetAllMovies()
+        [EnableQuery]
+        [Authorize(Roles = "Admin,Customer")]// Kích hoạt OData query, cho phép phân trang, lọc, sắp xếp
+        public async Task<IActionResult> GetAllMovies([FromHeader(Name = "Authorization")] string header)
         {
-            var movies = await _movieService.GetAllMoviesAsync();
-            return Ok(movies);  // Trả về danh sách phim
+            var user = await ValidateToken(header);
+            if (user == null)
+                return Unauthorized("User not found or token is invalid");
+
+            try
+            {
+                var movies = await _movieService.GetAllMoviesAsync();
+                return Ok(movies);  // Trả về danh sách phim
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+          
         }
 
         // Phương thức GET để lấy movie theo ID (User và Admin có thể truy cập)
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,User")]
+        [Authorize(Roles = "Admin,Customer")]
         public async Task<IActionResult> GetMovieById(int id, [FromHeader(Name = "Authorization")] string header)
         {
             var user = await ValidateToken(header);

@@ -25,7 +25,9 @@ namespace MovieWebAPI.Services
             var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.GivenName, user.UserName)
+            new Claim(JwtRegisteredClaimNames.GivenName, user.UserName),
+            new Claim(JwtRegisteredClaimNames.NameId,user.Id)
+            
 
         };
             var roles = _userManager.GetRolesAsync(user).Result;

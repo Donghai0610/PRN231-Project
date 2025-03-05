@@ -16,5 +16,6 @@ namespace BusinesObjects.Dtos.response.Actor
         public string Image { get; set; }
 
         public string MovieUrl { get; set; }
+
     }
 }

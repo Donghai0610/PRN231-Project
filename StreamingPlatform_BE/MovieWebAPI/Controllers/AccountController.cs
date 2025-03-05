@@ -36,7 +36,7 @@ namespace MovieWebAPI.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == loginRequest.UserName);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == loginRequest.UserName || u.Email == loginRequest.UserName);
             if (user == null) return Unauthorized("Invalid Username or Password");
 
             // Kiểm tra trạng thái tài khoản có active không

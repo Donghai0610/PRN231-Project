@@ -48,5 +48,33 @@ namespace MovieWebAPI.Services
 
             return uploadResult.SecureUrl?.ToString() ?? throw new Exception("Upload failed: SecureUrl is null");
         }
+
+
+        public async Task<string> UploadHTML(IFormFile htmlFile, string folderName)
+        {
+            if (htmlFile == null || htmlFile.Length == 0)
+            {
+                throw new ArgumentException("Invalid HTML file");
+            }
+
+            // Tạo đối tượng RawUploadParams mà không cần thiết phải gán ResourceType
+            var uploadParams = new RawUploadParams()
+            {
+                File = new FileDescription(htmlFile.FileName, htmlFile.OpenReadStream()),
+                Folder = folderName,
+            };
+
+            // Tải file lên Cloudinary
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            if (uploadResult.Error != null)
+            {
+                throw new Exception($"Cloudinary upload error: {uploadResult.Error.Message}");
+            }
+
+            // Trả về URL của file HTML đã tải lên
+            return uploadResult.SecureUrl?.ToString() ?? throw new Exception("Upload failed: SecureUrl is null");
+        }
+
     }
 }

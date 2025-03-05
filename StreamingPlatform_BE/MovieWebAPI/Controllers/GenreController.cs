@@ -19,15 +19,13 @@ namespace MovieWebAPI.Controllers
     public class GenreController : ControllerBase
     {
         private readonly IGenreService _genreService;
-        private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
 
-        public GenreController(IGenreService genreService, ITokenService tokenService, IUserService userService, IMapper mapper)
+        public GenreController(IGenreService genreService, IUserService userService, IMapper mapper)
         {
             _genreService = genreService;
-            _tokenService = tokenService;
             _userService = userService;
             _mapper = mapper;
         }
@@ -44,7 +42,7 @@ namespace MovieWebAPI.Controllers
         }
 
         // Lấy tất cả thể loại (Chỉ Admin được phép thực hiện)
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Customer")]
         [HttpGet]
         public async Task<IActionResult> GetAllGenres([FromHeader(Name = "Authorization")] string header)
         {

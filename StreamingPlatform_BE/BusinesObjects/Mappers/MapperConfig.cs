@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using BusinesObjects.Dtos.request.Actor;
 using BusinesObjects.Dtos.request.Auth;
+using BusinesObjects.Dtos.request.Blog;
 using BusinesObjects.Dtos.request.Genre;
 using BusinesObjects.Dtos.request.Movie;
 using BusinesObjects.Dtos.response.Actor;
 using BusinesObjects.Dtos.response.Auth;
+using BusinesObjects.Dtos.response.Blog;
 using BusinesObjects.Dtos.response.Genre;
 using BusinesObjects.Dtos.response.Movie;
 using BusinesObjects.Models;
@@ -62,6 +64,15 @@ namespace BusinesObjects.Mappers
 
 
             CreateMap<Movie, ActorMovieResponseDTO>().ReverseMap();
+
+            //Blog
+            CreateMap<BlogRequestDTO, Blog>()
+                .ForMember(dest => dest.Content, opt => opt.Ignore())
+                .ReverseMap();
+            CreateMap<Blog, BlogResponseDTO>().ReverseMap();
+
+            CreateMap<UpdateBlogRequestDTO, Blog>()
+               .ForMember(dest => dest.Content, opt => opt.Ignore()); 
 
         }
 
