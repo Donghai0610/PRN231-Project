@@ -19,39 +19,39 @@ namespace MovieWebAPI.Controllers
         }
 
         // GET: api/users (Lấy tất cả người dùng với OData)
-        //[HttpGet]
-        //[Authorize(Roles = "Admin")]
-        //[EnableQuery]
-        //public async Task<IActionResult> GetAllUsers([FromQuery] ODataQueryOptions<AppUser> queryOptions)
-        //{
-        //    var users = await _userService.GetAllUsersAsync(queryOptions);
-        //    return Ok(users);
-        //}
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        [EnableQuery]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users =  _userService.GetAllUsers();
+            return Ok(users);
+        }
 
         // GET: api/users/{id} (Lấy chi tiết người dùng)
-        //[HttpGet("{id}")]
-        //[Authorize(Roles = "Admin,Customer")]
-        //public async Task<IActionResult> GetUserDetail(string id)
-        //{
-        //    var user = await _userService.GetUserDetailAsync(id);
-        //    if (user == null)
-        //    {
-        //        return NotFound("User not found.");
-        //    }
-        //    return Ok(user);
-        //}
+        [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Customer")]
+        public async Task<IActionResult> GetUserDetail(string id)
+        {
+            var user = await _userService.GetUserDetailAsync(id);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+            return Ok(user);
+        }
 
         //// PUT: api/users/{id}/isActive (Cập nhật trạng thái isActive)
-        //[HttpPut("{id}/isActive")]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> UpdateIsActive(string id, [FromBody] bool isActive)
-        //{
-        //    var result = await _userService.UpdateIsActiveAsync(id, isActive);
-        //    if (result)
-        //    {
-        //        return Ok("User status updated successfully.");
-        //    }
-        //    return NotFound("User not found.");
-        //}
+        [HttpPut("{id}/isActive")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateIsActive(string id, [FromBody] bool isActive)
+        {
+            var result = await _userService.UpdateIsActiveAsync(id, isActive);
+            if (result)
+            {
+                return Ok("User status updated successfully.");
+            }
+            return NotFound("User not found.");
+        }
     }
 }

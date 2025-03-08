@@ -26,7 +26,10 @@ namespace MovieWebAPI.Repository
         // Lấy tất cả Actor từ cơ sở dữ liệu
         public async Task<IEnumerable<Actor>> GetAllActorsAsync()
         {
-            return await _context.Actors.ToListAsync();
+            return await _context.Actors
+                .Include(a => a.MovieActors)
+                 .ThenInclude(ma => ma.Movie)
+                .ToListAsync();
         }
 
         // Lấy Actor theo ID

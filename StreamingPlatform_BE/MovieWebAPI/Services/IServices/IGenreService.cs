@@ -6,7 +6,7 @@ namespace MovieWebAPI.Services.IServices
 {
     public interface IGenreService
     {
-        Task<IEnumerable<GenreResponseDTO>> GetAllGenresAsync();
+        IQueryable<Genre> GetAllGenre();
         Task<GenreResponseDTO> GetGenreByIdAsync(int genreId);
         Task<GenreResponseDTO> AddGenreAsync(NewGenreRequestDTO genreDto);
         Task<bool> UpdateGenreAsync(UpdateGenreRequestDTO genreDto);

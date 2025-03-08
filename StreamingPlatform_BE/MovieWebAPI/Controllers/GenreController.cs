@@ -7,6 +7,7 @@ using BusinesObjects.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using MovieWebAPI.Services;
 using MovieWebAPI.Services.IServices;
 using System.Reflection.PortableExecutable;
@@ -43,7 +44,8 @@ namespace MovieWebAPI.Controllers
 
         // Lấy tất cả thể loại (Chỉ Admin được phép thực hiện)
         [Authorize(Roles = "Admin,Customer")]
-        [HttpGet]
+        [HttpGet("/odata/Genre")]
+        [EnableQuery]
         public async Task<IActionResult> GetAllGenres([FromHeader(Name = "Authorization")] string header)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -55,12 +57,15 @@ namespace MovieWebAPI.Controllers
             var user = await _userService.GetUserFromToken(token);
 
             if (user == null) return Unauthorized("User not found or token is invalid");
-            var genres = await _genreService.GetAllGenresAsync();
-            var response = _mapper.Map<IEnumerable<GenreResponseDTO>>(genres);
-            return Ok(response);
+
+            var genres = _genreService.GetAllGenre();
+            var genreResponseDTO = _mapper.Map<IEnumerable<GenreResponseDTO>>(genres);
+
+            return Ok(genreResponseDTO);
 
         }
 
+        
         // Thêm thể loại mới (Chỉ Admin được phép thực hiện)
         [HttpPost]
         [Authorize(Roles = "Admin")]  // Chỉ cho phép Admin truy cập
@@ -137,7 +142,7 @@ namespace MovieWebAPI.Controllers
                 // Bắt các lỗi khác và trả về lỗi chung
                 return StatusCode(500, new { message = "An error occurred while creating the genre.", details = ex.Message });
             }
-            
+
 
         }
 

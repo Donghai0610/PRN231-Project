@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, Form, InputGroup, FormControl } from 'react-bootstrap';
 import { fetchData, updateData } from '../API/ApiService';
 
-const TicketManagement = () => {
+const BlogManagement = () => {
   const [accounts, setAccounts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   
@@ -128,4 +128,4 @@ const TicketManagement = () => {
   );
 };
 
-export default TicketManagement;
+export default BlogManagement;

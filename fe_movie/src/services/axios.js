@@ -43,10 +43,7 @@ axiosInstance.interceptors.response.use(
     function (error) {
         // Xử lý lỗi tùy thuộc vào mã lỗi
         if (error.response && error.response.status === 400) {
-            // localStorage.clear();
-            // window.location.href = "/login";
         } else if (error.response && error.response.status === 403) {
-            // window.location.href = "/access-denied"
         }
         return Promise.reject(error);
     }

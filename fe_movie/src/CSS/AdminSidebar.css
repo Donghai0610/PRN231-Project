@@ -1,0 +1,26 @@
+/* AdminSidebar.css */
+.sidebar-link {
+    text-decoration: none;  /* Bỏ gạch chân mặc định */
+    color: #007bff; /* Màu chữ mặc định cho liên kết */
+    font-weight: bold;
+  }
+  
+  .sidebar-link:hover {
+    text-decoration: underline; /* Thêm gạch chân khi hover */
+    color: #0056b3; /* Màu khi hover */
+  }
+  
+  .sidebar-link:focus {
+    outline: none; /* Bỏ outline khi focus */
+  }
+  /* AdminSidebar.css */
+
+/* Kiểu dáng mặc định của các menu item */
+
+  
+  /* Kiểu dáng của menu item khi được chọn */
+  .active-sidebar-item {
+    font-weight: bold; /* Tô đậm */
+    color: #007bff; /* Màu khi item được chọn */
+  }
+  

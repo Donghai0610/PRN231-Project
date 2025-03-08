@@ -36,9 +36,9 @@ namespace MovieWebAPI.Services
         }
 
 
-        public async Task<IEnumerable<AppUser>> GetAllUsersAsync(ODataQueryOptions<AppUser> queryOptions)
+        public  IQueryable<AppUser> GetAllUsers()
         {
-            return await _userRepository.GetAllUsersAsync(queryOptions);
+            return  _userRepository.GetAllUsers();
         }
 
         // Lấy chi tiết người dùng theo userId

@@ -33,7 +33,7 @@ namespace MovieWebAPI.Services
             // Phân trang
             var totalItems = actors.Count();
             var totalPages = (int)Math.Ceiling(totalItems / (double)queryParameters.PageSize);
-            var pagedActors = actors.Skip((queryParameters.Page - 1) * queryParameters.PageSize).Take(queryParameters.PageSize).ToList();
+            var pagedActors = actors.Skip((queryParameters.Page -1) * queryParameters.PageSize).Take(queryParameters.PageSize).ToList();
 
             // Ánh xạ Actor sang ActorResponseDTO
             var actorResponseDTOs = _mapper.Map<List<ActorResponseDTO>>(pagedActors);

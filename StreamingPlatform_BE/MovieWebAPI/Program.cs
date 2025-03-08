@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using BusinesObjects;
 using BusinesObjects.Mappers;
 using BusinesObjects.Models;
@@ -26,6 +26,7 @@ var modelBuilder = new ODataConventionModelBuilder();
 modelBuilder.EntitySet<Movie>("Movies");
 modelBuilder.EntitySet<Blog>("Blog");
 modelBuilder.EntitySet<AppUser>("User");
+modelBuilder.EntitySet<Genre>("Genre");
 
 
 builder.Services.AddControllers();
@@ -54,9 +55,15 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 }).AddEntityFrameworkStores<ApplicationDBContext>()
 .AddDefaultTokenProviders();
 
-builder.Services.AddControllers().AddOData(options =>
-    options.Select().Filter().OrderBy().Count().Expand().SetMaxTop(100).AddRouteComponents(
-            "odata", modelBuilder.GetEdmModel())
+builder.Services.AddControllers()
+    .AddOData(options =>
+        options.Select()
+               .Filter()
+               .OrderBy()
+               .Count()
+               .Expand()
+               .SetMaxTop(100)
+               .AddRouteComponents("odata", modelBuilder.GetEdmModel()) // Đảm bảo đã cấu hình route OData
     );
 
 builder.Services.AddAuthentication(options =>
@@ -139,7 +146,7 @@ app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapControllers(); 
+    endpoints.MapControllers();
 });
 
 app.MapControllers();

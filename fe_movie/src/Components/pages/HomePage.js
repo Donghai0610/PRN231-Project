@@ -121,7 +121,7 @@ function HomePage() {
                       <span>Thời lượng:</span> {movie.duration || "N/A"} phút
                     </li>
                     <li>
-                      <span>Ngày khởi chiếu:</span>{" "}
+                      <span>Ngày sản chiếu:</span>{" "}
                       {movie.release_date || "N/A"}
                     </li>
                   </ul>

@@ -11,7 +11,7 @@ namespace MovieWebAPI.Services.IServices
         Task<bool> HasRole(AppUser user, string role);
 
 
-        Task<IEnumerable<AppUser>> GetAllUsersAsync(ODataQueryOptions<AppUser> queryOptions);
+        IQueryable<AppUser> GetAllUsers();
         Task<AppUser> GetUserDetailAsync(string userId);
         Task<bool> UpdateIsActiveAsync(string userId, bool isActive);
     }

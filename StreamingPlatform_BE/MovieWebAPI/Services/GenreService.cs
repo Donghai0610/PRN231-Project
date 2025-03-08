@@ -19,11 +19,7 @@ namespace MovieWebAPI.Services
         }
 
         // Lấy tất cả thể loại
-        public async Task<IEnumerable<GenreResponseDTO>> GetAllGenresAsync()
-        {
-            var genres = await _genreRepository.GetAllGenresAsync();
-            return _mapper.Map<IEnumerable<GenreResponseDTO>>(genres);
-        }
+       
 
         // Lấy thể loại theo ID
         public async Task<GenreResponseDTO> GetGenreByIdAsync(int genreId)
@@ -73,6 +69,11 @@ namespace MovieWebAPI.Services
         public async Task<bool> IsGenreExistsAsync(string genreName)
         {
             return await _genreRepository.IsGenreExistsAsync(genreName);
+        }
+
+        public IQueryable<Genre> GetAllGenre()
+        {
+            return _genreRepository.GetGenres();
         }
     }
 }

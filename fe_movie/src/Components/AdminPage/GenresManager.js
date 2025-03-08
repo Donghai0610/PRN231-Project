@@ -1,281 +1,337 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Form, Modal, Container, Alert } from "react-bootstrap";
-import { fetchData, postData, updateData, deleteData } from "../API/ApiService";
-
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Tooltip,
+  Modal,
+  Button,
+  TextField,
+  Box,
+  Typography,
+  InputAdornment,
+  TablePagination,
+  Pagination,
+} from "@mui/material";
+import { FaPlus, FaEdit, FaTrashAlt } from "react-icons/fa";
+import SearchIcon from "@mui/icons-material/Search";
+import Genre_Services from "../../services/genre";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useDebounce } from 'use-debounce';
 const GenresManager = () => {
   const [genres, setGenres] = useState([]);
   const [currentGenre, setCurrentGenre] = useState(null);
   const [newGenre, setNewGenre] = useState("");
-  const [newStatus, setNewStatus] = useState("active");
+  const [searchTerm, setSearchTerm] = useState(""); // for search
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteGenreId, setDeleteGenreId] = useState(null);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
+  const [page, setPage] = useState(0); // Track the current page for pagination
+  const [totalCount, setTotalCount] = useState(0); // Total number of items
   const [validationError, setValidationError] = useState("");
-
-  const fetchGenres = async () => {
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500); // Delay is 500ms
+  // Fetch genres with pagination
+  const fetchGenres = async (searchTerm = "", page = 0, rowsPerPage = 10) => {
     try {
-      const data = await fetchData("genres");
-      setGenres(data);
+      const skip = page * rowsPerPage;  // Calculate skip based on current page
+      let filter = "";  // Default empty filter
+
+      // If there's a searchTerm, apply the filter
+      if (searchTerm) {
+        filter = `&$filter=contains(name, '${searchTerm}')`;  // Filter genres by name
+      }
+
+      // Call the API to fetch data
+      const response = await Genre_Services.GetAllGenre(filter, skip, rowsPerPage);
+
+      // Correct the total count based on the response length
+      const totalGenres = 100;  // Make sure you get the correct count here
+      setGenres(response.data);  // Set the genres in state
+      setTotalCount(totalGenres);  // Set the total count in state
+
     } catch (error) {
-      console.error("Không thể lấy dữ liệu thể loại:", error);
+      console.error("Error fetching genres:", error);
     }
   };
 
+
+
+  // Validate genre name to prevent duplicates
   const validateGenre = (name) => {
-    const isDuplicate = genres.some((genre) => genre.name.toLowerCase() === name.toLowerCase());
-    return isDuplicate;
+    return genres.some((genre) => genre.name === name); // Check for duplicates
   };
 
+  // Add a new genre
   const addGenre = async () => {
     if (!newGenre) {
       setValidationError("Tên thể loại không được để trống!");
       return;
     }
-
     if (validateGenre(newGenre)) {
       setValidationError("Thể loại này đã tồn tại!");
       return;
     }
-
     try {
-      const added = await postData("genres", { name: newGenre, status: newStatus });
-      setGenres((prev) => [...prev, added]);
-      setNewGenre("");
-      setNewStatus("active");
+      const added = await Genre_Services.CreateGenre({ name: newGenre });
+
+      // Thêm thể loại mới vào mảng genres trong state mà không cần phải reload lại
+      setGenres((prev) => [added, ...prev]);
+
+      setNewGenre(""); // Reset input
       setShowModal(false);
       setValidationError("");
-      setSuccess("Thêm thể loại thành công!");
-      setError(null);
+      toast.success("Thêm thể loại thành công!");
     } catch (error) {
-      console.error("Không thể thêm thể loại:", error);
-      setValidationError("Không thể thêm thể loại. Vui lòng thử lại!");
-      setError("Không thể thêm thể loại!");
-      setSuccess(null);
+      toast.error("Không thể thêm thể loại!");
     }
   };
 
   const editGenre = async () => {
-    if (!currentGenre || !currentGenre.name) {
-      setValidationError("Tên thể loại không được để trống!");
-      return;
-    }
-
-    if (validateGenre(currentGenre.name)) {
-      setValidationError("Thể loại này đã tồn tại!");
+    if (!currentGenre || !currentGenre.name || !currentGenre.genreId) {
+      setValidationError("Tên thể loại không được để trống hoặc id không hợp lệ!");
       return;
     }
 
     try {
-      const updated = await updateData("genres", currentGenre.id, {
-        id: currentGenre.id,
+      const updated = await Genre_Services.UpdateGenre(parseInt(currentGenre.genreId, 10), {
+        genreId: parseInt(currentGenre.genreId, 10),
         name: currentGenre.name,
-        status: currentGenre.status,
       });
-      setGenres((prev) =>
-        prev.map((genre) => (genre.id === updated.id ? updated : genre))
-      );
+
+      // Optionally refetch genres to make sure everything is up to date
+      fetchGenres(searchTerm, page);
+
       setCurrentGenre(null);
       setShowModal(false);
       setValidationError("");
-      setSuccess("Cập nhật thể loại thành công!");
+      toast.success("Cập nhật thể loại thành công!");
     } catch (error) {
-      console.error("Không thể cập nhật thể loại:", error);
-      setValidationError("Không thể cập nhật thể loại. Vui lòng thử lại!");
-      setError("Không thể cập nhật thể loại!");
-      setSuccess(null);
+      toast.error("Không thể cập nhật thể loại!");
     }
   };
 
-  const toggleStatus = async (genre) => {
-    const updatedStatus = genre.status === "active" ? "inactive" : "active";
-    try {
-      const updated = await updateData("genres", genre.id, {
-        ...genre,
-        status: updatedStatus,
-      });
-      setGenres((prev) =>
-        prev.map((item) => (item.id === updated.id ? updated : item))
-      );
-      setSuccess("Cập nhật trạng thái thể loại thành công!");
-      setError(null);
-    } catch (error) {
-      console.error("Không thể thay đổi trạng thái thể loại:", error);
-      setError("Không thể thay đổi trạng thái thể loại. Vui lòng thử lại!");
-      setSuccess(null);
-    }
-  };
 
+  // Delete a genre
   const deleteGenre = async () => {
     try {
-      await deleteData("genres", deleteGenreId);
-      setGenres((prev) => prev.filter((genre) => genre.id !== deleteGenreId));
-      setSuccess("Xóa thể loại thành công!");
-      setError(null);
+      await Genre_Services.DeleteGenre(deleteGenreId);
+
+      // Loại bỏ thể loại bị xóa khỏi genres trong state
+      setGenres((prev) => prev.filter((genre) => genre.genreId !== deleteGenreId));
+
+      toast.success("Xóa thể loại thành công!");
       setShowDeleteModal(false);
     } catch (error) {
-      console.error("Không thể xóa thể loại:", error);
-      setError("Không thể xóa thể loại. Vui lòng thử lại!");
-      setSuccess(null);
+      toast.error("Không thể xóa thể loại!");
       setShowDeleteModal(false);
     }
-  };
-
-  const handleCancel = () => {
-    setValidationError("");
-    setShowModal(false);
-  };
-
-  const handleDeleteCancel = () => {
-    setShowDeleteModal(false);
-    setDeleteGenreId(null);
   };
 
   useEffect(() => {
-    fetchGenres();
-  }, []);
+    fetchGenres(debouncedSearchTerm, page);
+  }, [debouncedSearchTerm, page]);  // Fetch again only when debouncedSearchTerm or page changes
+
+  // Handle search term change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);  // Update search term
+  };
+
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage - 1);  // Cập nhật trang (subtract 1 vì trang bắt đầu từ 1 trong Pagination)
+    fetchGenres(debouncedSearchTerm, newPage - 1);  // Gọi lại API để tải dữ liệu trang mới
+  };
+  
+
 
   return (
-    <Container>
-      <h2 className="my-4 text-center">Quản Lý Thể Loại</h2>
-      {error && <Alert variant="danger" onClose={() => setError(null)} dismissible>{error}</Alert>}
-      {success && <Alert variant="success" onClose={() => setSuccess(null)} dismissible>{success}</Alert>}
+    <Box sx={{ padding: 3 }}>
+      <Typography variant="h4" align="center" gutterBottom>
+        Quản Lý Thể Loại
+      </Typography>
 
-      <Table striped bordered hover responsive className="text-center">
-        <thead className="table-dark">
-          <tr>
-            <th>ID</th>
-            <th>Thể Loại</th>
-            <th>Trạng Thái</th>
-            <th>Hành Động</th>
-          </tr>
-        </thead>
-        <tbody>
-          {genres.map((genre) => (
-            <tr key={genre.id}>
-              <td>{genre.id}</td>
-              <td>{genre.name}</td>
-              <td>
-                <Button
-                  variant={genre.status === "active" ? "success" : "secondary"}
-                  onClick={() => toggleStatus(genre)}
-                >
-                  {genre.status === "active" ? "Hoạt động" : "Vô hiệu"}
-                </Button>
-              </td>
-              <td>
-                <Button
-                  variant="warning"
-                  className="me-2"
-                  onClick={() => {
-                    setCurrentGenre(genre);
-                    setShowModal(true);
-                  }}
-                >
-                  <i className="bi bi-pencil-square"></i> Sửa
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => {
-                    setDeleteGenreId(genre.id);
-                    setShowDeleteModal(true);
-                  }}
-                >
-                  <i className="bi bi-trash"></i> Xóa
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      {/* Search bar */}
+      <Box display="flex" justifyContent="space-between" mb={3}>
+        <TextField
+          variant="outlined"
+          label="Tìm kiếm theo tên thể loại"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton>
+                  <SearchIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          fullWidth
+          sx={{ maxWidth: "300px" }}
+        />
 
-      <Button
-        variant="primary"
-        className="mt-3"
-        onClick={() => {
-          setCurrentGenre(null);
-          setNewGenre("");
-          setNewStatus("active");
-          setShowModal(true);
-        }}
-      >
-        <i className="bi bi-plus-circle"></i> Thêm Thể Loại
-      </Button>
+        {/* Add Genre Button */}
+        <Button
+          variant="contained"
+          color="primary"
+          style={{ textTransform: "none", width: "150px" }}
+          onClick={() => {
+            setCurrentGenre(null);
+            setNewGenre("");
+            setShowModal(true);
+          }}
+          sx={{ marginLeft: "auto" }}
+        >
+          <FaPlus />
+        </Button>
+      </Box>
 
-      <Modal
-        show={showModal}
-        onHide={handleCancel}
-        centered
-        backdrop="static"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
+      <TableContainer>
+  <Table sx={{ minWidth: 650 }} aria-label="simple table">
+    <TableHead>
+      <TableRow>
+        <TableCell sx={{ backgroundColor: "#f5f5f5", fontWeight: "bold" ,justifyContent: "center"}}>
+          Tên Thể Loại
+        </TableCell>
+        <TableCell sx={{ backgroundColor: "#f5f5f5", fontWeight: "bold", justifyContent: "center" }}>
+          Hành Động
+        </TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {genres && genres.length > 0 ? (
+        genres.map((genre) => (
+          <TableRow key={genre.genreId}>
+            <TableCell>{genre.name}</TableCell>
+            <TableCell>
+              <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 1 }}>
+                <Tooltip title="Chỉnh sửa">
+                  <IconButton
+                    color="warning"
+                    onClick={() => {
+                      setCurrentGenre(genre);
+                      setShowModal(true);
+                    }}
+                    style={{ width: "32px", height: "32px" }}
+                  >
+                    <FaEdit />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Xóa">
+                  <IconButton
+                    color="error"
+                    onClick={() => {
+                      setDeleteGenreId(genre.genreId);
+                      setShowDeleteModal(true);
+                    }}
+                    style={{ width: "32px", height: "32px" }}
+                  >
+                    <FaTrashAlt />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </TableCell>
+          </TableRow>
+        ))
+      ) : (
+        <TableRow>
+          <TableCell colSpan={2} align="center">
+            Không có dữ liệu
+          </TableCell>
+        </TableRow>
+      )}
+    </TableBody>
+  </Table>
+</TableContainer>
+
+{/* Pagination */}
+<Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 2 }}>
+  <Pagination
+    count={Math.ceil(totalCount / 10)}  // Tính tổng số trang
+    page={page + 1}  // Chuyển trang hiện tại từ 0 sang 1
+    onChange={handlePageChange}  // Cập nhật trang khi người dùng thay đổi
+    color="primary"
+    showFirstButton
+    showLastButton
+  />
+</Box>
+
+
+
+
+
+
+
+      {/* Modal for Add/Edit Genre */}
+      <Modal open={showModal} onClose={() => setShowModal(false)}>
+        <Box
+          sx={{
+            p: 3,
+            backgroundColor: "white",
+            borderRadius: 1,
+            maxWidth: "400px",
+            width: "100%",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
             {currentGenre ? "Sửa Thể Loại" : "Thêm Thể Loại"}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3" controlId="formGenreName">
-              <Form.Label>* Tên Thể Loại</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Nhập tên thể loại"
-                value={currentGenre ? currentGenre.name : newGenre}
-                onChange={(e) => {
-                  currentGenre
-                    ? setCurrentGenre({
-                      ...currentGenre,
-                      name: e.target.value,
-                    })
-                    : setNewGenre(e.target.value);
-                  setValidationError("");
-                }}
-                isInvalid={validationError}
-              />
-              {validationError && (
-                <Form.Control.Feedback type="invalid">
-                  {validationError}
-                </Form.Control.Feedback>
-              )}
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCancel}>
-            Hủy
-          </Button>
-          <Button
-            variant="success"
-            onClick={currentGenre ? editGenre : addGenre}
-          >
-            Lưu
-          </Button>
-        </Modal.Footer>
+          </Typography>
+          <TextField
+            label="Tên Thể Loại"
+            variant="outlined"
+            value={currentGenre ? currentGenre.name : newGenre}
+            onChange={(e) => {
+              currentGenre
+                ? setCurrentGenre({ ...currentGenre, name: e.target.value })
+                : setNewGenre(e.target.value);
+              setValidationError("");
+            }}
+            fullWidth
+            margin="normal"
+            error={!!validationError}
+            helperText={validationError}
+          />
+          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+            <Button variant="outlined" onClick={() => setShowModal(false)}>
+              Hủy
+            </Button>
+            <Button variant="contained" color="primary" onClick={currentGenre ? editGenre : addGenre}>
+              Lưu
+            </Button>
+          </Box>
+        </Box>
       </Modal>
 
-      <Modal
-        show={showDeleteModal}
-        onHide={handleDeleteCancel}
-        centered
-        backdrop="static"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Xác Nhận Xóa Thể Loại</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Bạn có chắc chắn muốn xóa thể loại này không?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleDeleteCancel}>
-            Hủy
-          </Button>
-          <Button variant="danger" onClick={deleteGenre}>
-            Xóa
-          </Button>
-        </Modal.Footer>
+
+      {/* Modal for Deleting Genre */}
+      <Modal open={showDeleteModal} onClose={() => setShowDeleteModal(false)} centered>
+        <Box sx={{ p: 3, backgroundColor: "white", borderRadius: 1, maxWidth: "400px", width: "100%" }}>
+          <Typography variant="h6" gutterBottom>
+            Xác Nhận Xóa Thể Loại
+          </Typography>
+          <Typography>Bạn có chắc chắn muốn xóa thể loại này không?</Typography>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+            <Button variant="outlined" onClick={() => setShowDeleteModal(false)}>
+              Hủy
+            </Button>
+            <Button variant="contained" color="error" onClick={deleteGenre}>
+              Xóa
+            </Button>
+          </Box>
+        </Box>
       </Modal>
-    </Container>
+
+      {/* Toast notifications */}
+      <ToastContainer />
+    </Box>
   );
 };
 

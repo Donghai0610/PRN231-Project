@@ -15,14 +15,9 @@ namespace MovieWebAPI.Repository
         }
 
         // Lấy tất cả người dùng với OData query options
-        public async Task<IEnumerable<AppUser>> GetAllUsersAsync(ODataQueryOptions<AppUser> queryOptions)
+        public IQueryable<AppUser> GetAllUsers()
         {
-            var users = _context.Users.AsQueryable();
-            if (queryOptions != null)
-            {
-                users = queryOptions.ApplyTo(users) as IQueryable<AppUser>;
-            }
-            return await users.ToListAsync();
+            return _context.Users.AsQueryable();
         }
 
         // Lấy chi tiết người dùng theo userId

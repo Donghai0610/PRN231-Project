@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Container, Row, Col, Navbar, Nav, Dropdown } from "react-bootstrap";
+import { Container, Row, Col, Navbar, Nav, Button } from "react-bootstrap";
 import "../../CSS/Header.css";
 import Swal from "sweetalert2";
 import { jwtDecode } from "jwt-decode";
@@ -16,15 +16,16 @@ function Header() {
   const updateUserData = () => {
     // Check if token and account are in localStorage
     const token = localStorage.getItem("token");
-    const account =localStorage.getItem("account");
- const decodedToken = jwtDecode(token);
+    const account = localStorage.getItem("account");
+
     // If both token and account exist, the user is logged in
     if (token && account) {
+      const decodedToken = jwtDecode(token);
       setIsLoggedIn(true);
       setUsername(account);
       setRole(decodedToken.role);
       setUserId(decodedToken.nameid);
-   
+
     } else {
       setIsLoggedIn(false);
       setUsername("");
@@ -73,7 +74,7 @@ function Header() {
       }
     });
   };
-const logout = () => {
+  const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("account");
     setIsLoggedIn(false);
@@ -81,9 +82,9 @@ const logout = () => {
     setRole("");
     setUserId("");
   };
-  
 
-    
+
+
 
   const isActive = (path) => location.pathname === path ? 'active-tab' : '';
 
@@ -122,15 +123,15 @@ const logout = () => {
       <Navbar
         expand="lg"
         className="bg-white border-bottom"
-        style={{ marginBottom: "30px" }}
+        style={{ marginBottom: "0px" }}
       >
-        <Container>
+        <Container style={{ marginBottom: "0px" }}>
           <Navbar.Brand
             as={Link}
             to={"/"}
             className="d-flex align-items-center nav-image"
           >
-            <img src="../assets/Logo/black_on_trans.png" alt="Movie 88" />
+            <img src="../assets/Logo/logo.png" alt="Movie 88" />
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -164,67 +165,15 @@ const logout = () => {
                 Diễn Viên
               </Nav.Link>
               {role === "Admin" && (
-                <Dropdown align="end">
-                  <Dropdown.Toggle
-                    variant="link"
-                    id="dropdown-management"
-                    className="nav-link"
-                  >
-                    Quản Lý
-                  </Dropdown.Toggle>
-
-                  <Dropdown.Menu>
-                    <Dropdown.Item
-                      as={Link}
-                      to="/account"
-                      className={isActive("/account")}
-                    >
-                      Quản Lý Tài Khoản
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      as={Link}
-                      to="/managermovies"
-                      className={isActive("/managermovies")}
-                    >
-                      Quản Lý Phim
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      as={Link}
-                      to="/languages"
-                      className={isActive("/languages")}
-                    >
-                      Quản Lý Ngôn Ngữ
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      as={Link}
-                      to="/genres"
-                      className={isActive("/genres")}
-                    >
-                      Quản Lý Thể Loại
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      as={Link}
-                      to="/movietypes"
-                      className={isActive("/movietypes")}
-                    >
-                      Quản Lý Loại Phim
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      as={Link}
-                      to="/screens"
-                      className={isActive("/screens")}
-                    >
-                      Quản Lý Màn Hình
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      as={Link}
-                      to="/tickets"
-                      className={isActive("/tickets")}
-                    >
-                      Quản Lý Vé
-                    </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
+                <Button
+                  variant="link"
+                  id="admin-management-button"
+                  className="nav-link"
+                  as={Link}
+                  to="/admin"  // Chuyển hướng đến "/admin" khi nhấn vào button
+                >
+                  Quản Lý
+                </Button>
               )}
             </Nav>
           </Navbar.Collapse>

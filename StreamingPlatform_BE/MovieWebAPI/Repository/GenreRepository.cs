@@ -13,9 +13,9 @@ namespace MovieWebAPI.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<Genre>> GetAllGenresAsync()
+        public IQueryable<Genre> GetGenres()
         {
-            return await _context.Genres.ToListAsync();
+            return _context.Genres.AsQueryable();
         }
 
         public async Task<Genre> GetGenreByIdAsync(int genreId)
