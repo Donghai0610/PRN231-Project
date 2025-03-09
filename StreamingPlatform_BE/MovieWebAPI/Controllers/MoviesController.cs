@@ -29,7 +29,7 @@ namespace MovieWebAPI.Controllers
 
 
 
-        
+
         [HttpGet]
         [EnableQuery]
         [Authorize(Roles = "Admin,Customer")]// Kích hoạt OData query, cho phép phân trang, lọc, sắp xếp
@@ -44,11 +44,11 @@ namespace MovieWebAPI.Controllers
                 var movies = await _movieService.GetAllMoviesAsync();
                 return Ok(movies);  // Trả về danh sách phim
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
-          
+
         }
 
         // Phương thức GET để lấy movie theo ID (User và Admin có thể truy cập)
@@ -102,19 +102,16 @@ namespace MovieWebAPI.Controllers
             }
         }
 
-        // Cập nhật movie (Chỉ Admin được phép thực hiện)
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMovie(int id, [FromForm] UpdateMovieRequestDTO requestDTO, [FromHeader(Name = "Authorization")] string header)
         {
-            // Validate token và xác thực user
             var user = await ValidateToken(header);
             if (user == null)
             {
                 return Unauthorized(new { message = "User not found or token is invalid!" });
             }
 
-            // Kiểm tra sự khớp giữa ID trong URL và ID trong DTO
             if (id != requestDTO.MovieId)
             {
                 return BadRequest(new { message = "Movie ID mismatch" });
@@ -122,7 +119,6 @@ namespace MovieWebAPI.Controllers
 
             try
             {
-                // Gọi service để cập nhật movie
                 var updatedMovie = await _movieService.UpdateMovieAsync(id, requestDTO);
 
                 if (updatedMovie == null)
@@ -130,27 +126,23 @@ namespace MovieWebAPI.Controllers
                     return NotFound(new { message = "Movie not found" });
                 }
 
-                // Map movie đã cập nhật sang MovieResponseDTO
                 var movieResponseDTO = _mapper.Map<MovieResponseDTO>(updatedMovie);
 
-                // Tạo Response DTO cho API
                 var responseApi = new ResponseApiDTO<MovieResponseDTO>("200", "Update Movie Successfully", movieResponseDTO);
 
-                return Ok(responseApi);  // Trả về movie đã được cập nhật
+                return Ok(responseApi);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });  // Trả về lỗi nếu có, ví dụ: Movie không tồn tại
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                // Log chi tiết lỗi hoặc theo dõi thêm tại server
                 return StatusCode(500, new { message = "An error occurred while updating the movie.", details = ex.Message });
             }
         }
 
 
-        // Xóa movie (Chỉ Admin được phép thực hiện)
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMovie(int id, [FromHeader(Name = "Authorization")] string header)
@@ -165,13 +157,14 @@ namespace MovieWebAPI.Controllers
                 if (deletedMovie == null)
                     return NotFound("Movie not found");
 
-                return Ok("Movie deleted successfully");  // Trả về thông báo thành công
+                return Ok("Movie deleted successfully");
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while deleting the movie.", details = ex.Message });
             }
         }
+
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}/activate")]
         public async Task<IActionResult> ActivateMovie(int id, [FromBody] bool isActive, [FromHeader(Name = "Authorization")] string header)
@@ -181,7 +174,6 @@ namespace MovieWebAPI.Controllers
                 return Unauthorized("User not found or token is invalid!");
             try
             {
-                // Gọi service để cập nhật trạng thái của movie
                 var result = await _movieService.UpdateMovieStatusAsync(id, isActive);
 
                 if (!result)
@@ -198,7 +190,6 @@ namespace MovieWebAPI.Controllers
         }
 
 
-        // Phương thức để xác thực token và lấy user
         private async Task<AppUser> ValidateToken(string header)
         {
             if (string.IsNullOrWhiteSpace(header) || !header.StartsWith("Bearer "))
@@ -206,7 +197,7 @@ namespace MovieWebAPI.Controllers
 
             var token = header["Bearer ".Length..].Trim();
             var user = await _userService.GetUserFromToken(token);
-            return user;  // Nếu user không tồn tại, trả về null
+            return user;
         }
 
     }

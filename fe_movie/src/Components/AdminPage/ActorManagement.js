@@ -191,8 +191,6 @@ const ActorManagement = () => {
   };
 
   // Ví dụ sử dụng trong component
-  const formattedDate = formatDate("2025-02-28T00:00:00");
-  console.log(formattedDate);  // Output: "2025-02-28"
 
 
   return (

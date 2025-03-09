@@ -60,11 +60,10 @@ builder.Services.AddControllers()
         options.Select()
                .Filter()
                .OrderBy()
-               .Count()
+               .Count() // Bật tính năng COUNT
                .Expand()
                .SetMaxTop(100)
-               .AddRouteComponents("odata", modelBuilder.GetEdmModel()) // Đảm bảo đã cấu hình route OData
-    );
+               .AddRouteComponents("odata", modelBuilder.GetEdmModel()));
 
 builder.Services.AddAuthentication(options =>
 {
