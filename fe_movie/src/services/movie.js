@@ -163,18 +163,14 @@ const CreateMovie = async (movie) => {
       }  
   
       // Append actor IDs
-      if (movie.actors && movie.actors.length > 0) {
-        movie.actors.forEach(actor => {
-          formData.append('ActorIds', actor.id);  // Ensure you're appending actor ID
-        });
-      }
+      movie.actors.forEach(actorId => {
+        formData.append('ActorIds', actorId);
+      });
   
       // Append genre IDs
-      if (movie.genres && movie.genres.length > 0) {
-        movie.genres.forEach(genre => {
-          formData.append('GenreIds', genre.id);  // Ensure you're appending genre ID
-        });
-      }
+      movie.genres.forEach(genreId => {
+        formData.append('GenreIds', genreId);
+      });
   
       // Call the API to update the movie
       const response = await axiosInstance.put(`/api/Movies/${id}`, formData); // PUT để cập nhật

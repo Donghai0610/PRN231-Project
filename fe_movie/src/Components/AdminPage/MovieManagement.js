@@ -36,7 +36,7 @@ const MovieManagement = () => {
   const [actors, setActors] = useState([]); // List actors (if applicable)
   const [showModal, setShowModal] = useState(false); // Modal hiển thị khi thêm hoặc chỉnh sửa phim
   const [newMovie, setNewMovie] = useState({
-    title: "",
+    movieName: "",
     description: "",
     releaseDate: "",
     isActive: true,
@@ -49,7 +49,7 @@ const MovieManagement = () => {
   const [page, setPage] = useState(0); // Trang hiện tại
   const [rowsPerPage, setRowsPerPage] = useState(5); // Số dòng trên mỗi trang
   const [search, setSearch] = useState({
-    title: null,
+    movieName: null,
     genre: null,
     actor: null,
   });
@@ -76,14 +76,14 @@ const MovieManagement = () => {
   }, []);
 
   const loadMovies = async (skip = 0, rowsPerPage = 5) => {
-    const { title, genre, actor } = search;
+    const { movieName, genre, actor } = search;
 
     try {
       const allMoviesResponse = await axiosInstance.get("/api/Movies"); // Không phân trang
       const totalItems = allMoviesResponse.data.length;
       setTotalMoviesCount(totalItems);
 
-      const response = await Movie_Service.GetAllMovies(genre, actor, title, skip, rowsPerPage); // Dùng skip cho phân trang
+      const response = await Movie_Service.GetAllMovies(genre, actor, movieName, skip, rowsPerPage); // Dùng skip cho phân trang
 
       setMovies(response);
     } catch (error) {
@@ -133,25 +133,36 @@ const MovieManagement = () => {
 
   // Handle selecting multiple items for actors or genres
   const handleSelectMultipleChange = (e, field) => {
-    const selectedOptions = e.target.value;
+    const selectedIds = e.target.value; // Mảng ID do MUI trả về
 
-    if (editMovie) {
-      setEditMovie(prevMovie => ({
-        ...prevMovie,
-        [field]: selectedOptions,
-      }));
-    } else {
-      setNewMovie(prevMovie => ({
-        ...prevMovie,
-        [field]: selectedOptions,
-      }));
+    if (field === "actors") {
+      // Tìm toàn bộ object diễn viên tương ứng
+      const selectedActors = actors.filter(actor =>
+        selectedIds.includes(actor.actorId)
+      );
+      if (editMovie) {
+        setEditMovie(prev => ({ ...prev, actors: selectedActors }));
+      } else {
+        setNewMovie(prev => ({ ...prev, actors: selectedActors }));
+      }
     }
-  }
+    else if (field === "genres") {
+      const selectedGenres = genres.filter(genre =>
+        selectedIds.includes(genre.genreId)
+      );
+      if (editMovie) {
+        setEditMovie(prev => ({ ...prev, genres: selectedGenres }));
+      } else {
+        setNewMovie(prev => ({ ...prev, genres: selectedGenres }));
+      }
+    }
+  };
+
 
   const handleAdd = () => {
 
     setNewMovie({
-      title: "",
+      movieName: "",
       description: "",
       releaseDate: "",
       isActive: true,
@@ -170,13 +181,20 @@ const MovieManagement = () => {
       toast.error("Vui lòng chọn ảnh cho phim!");
       return;
     }
+    let finalActors = editMovie
+      ? editMovie.actors.map(a => a.actorId)
+      : newMovie.actors.map(a => a.actorId);
 
-    // Ensure that genres and actors are not empty
-    const updatedMovieData = {
+    let finalGenres = editMovie
+      ? editMovie.genres.map(g => g.genreId)
+      : newMovie.genres.map(g => g.genreId);
+
+
+      const updatedMovieData = {
       ...newMovie,
       image: newMovie.image || editMovie?.image,  // Use the image if provided, else use existing
-      genres: newMovie.genres.length > 0 ? newMovie.genres : (editMovie ? editMovie.genres : []),
-      actors: newMovie.actors.length > 0 ? newMovie.actors : (editMovie ? editMovie.actors : [])
+      actors: finalActors,
+      genres: finalGenres,
     };
 
     try {
@@ -265,8 +283,8 @@ const MovieManagement = () => {
       <Box sx={{ display: "flex", gap: 2, marginBottom: 2 }}>
         <TextField
           label="Tìm kiếm theo tên phim"
-          name="title"
-          value={search.title || ""}
+          name="movieName"
+          value={search.movieName || ""}
           onChange={handleSearchChange}
           fullWidth
           variant="outlined"
@@ -353,13 +371,13 @@ const MovieManagement = () => {
                   </TableCell>
                   <TableCell style={{ fontFamily: 'cursive', fontSize: '20px' }}>
                     <Box sx={{ display: "flex", gap: 1 }}>
-                      <Tooltip title="Sửa">
+                      <Tooltip movieName="Sửa">
                         <IconButton style={{ width: 'fit-content' }}
                           color="warning" onClick={() => handleEdit(movie)}>
                           <FaEdit />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Xóa">
+                      <Tooltip movieName="Xóa">
                         <IconButton style={{ width: 'fit-content' }} color="error" onClick={() => handleDelete(movie.id)}>
                           <FaTrashAlt />
                         </IconButton>
@@ -387,7 +405,7 @@ const MovieManagement = () => {
       <Modal
         open={showModal}
         onClose={() => setShowModal(false)}
-        aria-labelledby="modal-title"
+        aria-labelledby="modal-movieName"
         sx={{
           display: "flex",
           justifyContent: "center",
@@ -403,7 +421,7 @@ const MovieManagement = () => {
             width: "100%",
           }}
         >
-          <Typography variant="h6" id="modal-title" textAlign="center">
+          <Typography variant="h6" id="modal-movieName" textAlign="center">
             {editMovie ? "Chỉnh Sửa Phim" : "Thêm Phim Mới"}
           </Typography>
           <form>
@@ -465,15 +483,27 @@ const MovieManagement = () => {
             </FormControl>
 
             <MultipleSelectChip
-              names={actors && actors.length > 0 ? actors.map(actor => ({ id: actor.actorId, name: actor.fullName })) : []}
-              selectedValues={editMovie ? editMovie.actors.map(actor => actor.actorId) : newMovie.actors || []}
-              handleChange={(e) => handleSelectMultipleChange(e, 'actors')}
+              names={
+                actors && actors.length > 0
+                  ? actors.map(actor => ({ id: actor.actorId, name: actor.fullName }))
+                  : []
+              }
+              // Lấy ra mảng ID từ editMovie.actors (là mảng object) hoặc newMovie.actors (mảng object)
+              selectedValues={
+                editMovie
+                  ? (editMovie.actors || []).map(a => a.actorId)
+                  : (newMovie.actors || []).map(a => a.actorId)
+              }
+              handleChange={(e) => handleSelectMultipleChange(e, "actors")}
               label="Diễn Viên"
             />
 
             <MultipleSelectChip
               names={genres && genres.length > 0 ? genres.map(genre => ({ id: genre.genreId, name: genre.name })) : []}
-              selectedValues={editMovie ? editMovie.genres.map(genre => genre.genreId) : newMovie.genres || []}
+              selectedValues={editMovie
+                ? (editMovie.genres || []).map(a => a.genreId)
+                : (newMovie.genres || []).map(a => a.genreId)
+              }
               handleChange={(e) => handleSelectMultipleChange(e, 'genres')}
               label="Thể Loại"
             />
