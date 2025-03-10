@@ -22,13 +22,14 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { FaEdit, FaTrashAlt, FaPlus, FaSearch } from "react-icons/fa";
+import { FaEdit, FaTrashAlt, FaPlus, FaSearch, FaTicketAlt } from "react-icons/fa";
 import Genre_Services from "../../services/genre";
 import Movie_Service from "../../services/movie";
 import axiosInstance from "../../services/axios";
 import { toast, ToastContainer } from "react-toastify";
 import Actor_Service from "../../services/actor";
 import MultipleSelectChip from "./component/MultipleSelectChip";
+import Swal from "sweetalert2";
 
 const MovieManagement = () => {
   const [movies, setMovies] = useState([]);
@@ -72,7 +73,7 @@ const MovieManagement = () => {
     };
 
     loadMoviesAndGenres();
-  }, [search, page,rowsPerPage  ]);
+  }, [page, rowsPerPage]);
 
   const loadMovies = async (skip = 0, rowsPerPage = 100) => {
     const { movieName, genre, actor } = search;
@@ -81,30 +82,30 @@ const MovieManagement = () => {
       const allMoviesResponse = await axiosInstance.get("/api/Movies");
       const totalItems = allMoviesResponse.data.length;
       setTotalMoviesCount(totalItems);
-  
+
       // Sau đó, lấy dữ liệu phân trang
       const response = await Movie_Service.GetAllMovies(genre, actor, movieName, skip, rowsPerPage);
       setMovies(response.data);  // Cập nhật lại danh sách phim
-  
+
     } catch (error) {
       console.error("Lỗi khi lấy phim:", error);
     }
   };
-  
+
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);  // Cập nhật lại trang hiện tại
     const skip = newPage * rowsPerPage;  // Tính toán số lượng item bỏ qua dựa trên số trang
     loadMovies(skip, rowsPerPage);  // Gọi lại hàm loadMovies với tham số mới
   };
-  
+
   const handleChangeRowsPerPage = (event) => {
     const newRowsPerPage = parseInt(event.target.value, 10);
     setRowsPerPage(newRowsPerPage);  // Cập nhật số dòng mỗi trang
     setPage(0);  // Quay lại trang đầu tiên
     loadMovies(0, newRowsPerPage);  // Gọi lại loadMovies với số dòng mới và trang đầu tiên
   };
-  
+
 
   const handleSearchChange = (e) => {
     const { name, value } = e.target;
@@ -134,7 +135,6 @@ const MovieManagement = () => {
       }));
     }
   };
-
   // Handle selecting multiple items for actors or genres
   const handleSelectMultipleChange = (e, field) => {
     const selectedIds = e.target.value; // Mảng ID do MUI trả về
@@ -180,70 +180,67 @@ const MovieManagement = () => {
   };
 
   const handleSubmit = async () => {
-    if (!newMovie.image && !editMovie) {
+    // Kiểm tra ảnh nếu không có
+    if ((!newMovie.image && !editMovie) || (editMovie && !newMovie.image)) {
       toast.error("Vui lòng chọn ảnh cho phim!");
       return;
     }
-  
+
+    // Lấy các actors và genres đã chọn
     let finalActors = editMovie
-      ? editMovie.actors.map(a => a.actorId)
-      : newMovie.actors.map(a => a.actorId);
-  
+      ? editMovie.actors.map((a) => a.actorId)
+      : newMovie.actors.map((a) => a.actorId);
+
     let finalGenres = editMovie
-      ? editMovie.genres.map(g => g.genreId)
-      : newMovie.genres.map(g => g.genreId);
-  
+      ? editMovie.genres.map((g) => g.genreId)
+      : newMovie.genres.map((g) => g.genreId);
+
     const updatedMovieData = {
-      ...newMovie,
-      image: newMovie.image || editMovie?.image, 
-      actors: finalActors,
-      genres: finalGenres,
+      movieName: editMovie ? editMovie.movieName : newMovie.movieName,
+      description: editMovie ? editMovie.description : newMovie.description,
+      releaseDate: editMovie ? editMovie.releaseDate : newMovie.releaseDate,
+      isActive: editMovie ? editMovie.isActive : newMovie.isActive,
+      movieUrl: editMovie ? editMovie.movieUrl : newMovie.movieUrl,
+      image: editMovie ? editMovie.image : newMovie.image,
+      actors: finalActors,  // Đảm bảo rằng bạn đã lấy actors từ editMovie hoặc newMovie
+      genres: finalGenres,  // Đảm bảo rằng bạn đã lấy genres từ editMovie hoặc newMovie
     };
-  
+
     try {
       let imageToUpload = updatedMovieData.image;
-  
       if (updatedMovieData.image === editMovie?.image) {
         imageToUpload = null;
       }
-  
-      console.log("Update : " + updatedMovieData.actors.length);
-  
+
       if (editMovie) {
-        await Movie_Service.UpdateMovie(editMovie.movieId, updatedMovieData);
+        // Cập nhật phim
+        const updatedResponse = await Movie_Service.UpdateMovie(editMovie.movieId, updatedMovieData);
         setMovies(movies.map((movie) =>
-          movie.movieId === editMovie.movieId ? { ...updatedMovieData, movieId: editMovie.movieId } : movie
+          movie.movieId === editMovie.movieId ? { ...updatedResponse, movieId: editMovie.movieId } : movie
         ));
         toast.success("Đã cập nhật phim thành công!");
       } else {
         // Thêm phim mới
         const createdMovie = await Movie_Service.CreateMovie(updatedMovieData);
-        setMovies([...movies, { ...createdMovie, movieId: movies.length + 1 }]);
+        setMovies([...movies, createdMovie]);
         toast.success("Đã thêm phim mới thành công!");
       }
-  
-      // Đóng modal sau khi thao tác xong
+
       setShowModal(false);
-      
-      loadMovies(page * rowsPerPage, rowsPerPage);
-  
+      loadMovies(page * rowsPerPage, rowsPerPage);  // Tải lại danh sách phim
     } catch (error) {
       console.error("Error submitting movie:", error);
       toast.error("Có lỗi xảy ra khi thêm hoặc cập nhật phim!" + error.message);
     }
   };
-  
-
 
   const handleEdit = (movie) => {
-    // Check the structure of the movie object before setting it
     console.log('Editing movie:', movie);
 
     setEditMovie(movie);
     setNewMovie({ ...movie });
     setShowModal(true);
   };
-
   const handleDelete = async (id) => {
     try {
       await Movie_Service.DeleteMovie(id);
@@ -278,8 +275,67 @@ const MovieManagement = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toISOString().split('T')[0];  // Chỉ lấy phần ngày "yyyy-MM-dd"
+
+    // Kiểm tra nếu dateString hợp lệ
+    if (isNaN(date)) {
+      console.error("Invalid date:", dateString);
+      return null;  // Hoặc trả về giá trị mặc định nếu cần
+    }
+
+    return date.toISOString().split('T')[0];
   };
+
+  // Hàm xử lý hành động xóa hoặc kích hoạt phim
+  const handleMovieAction = async (movie) => {
+    // Kiểm tra trạng thái của phim
+    if (movie.isActive) {
+      // Nếu phim đang active, xác nhận để xóa phim
+      const result = await Swal.fire({
+        title: 'Bạn có chắc chắn muốn xóa phim này?',
+        text: "Phim sẽ bị xóa vĩnh viễn!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Xóa',
+        cancelButtonText: 'Hủy'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await Movie_Service.DeleteMovie(movie.movieId); // Gọi hàm xóa phim từ service
+          Swal.fire('Đã xóa!', 'Phim đã được xóa thành công.', 'success');
+          loadMovies(page * rowsPerPage, rowsPerPage); // Tải lại danh sách phim sau khi xóa
+        } catch (error) {
+          Swal.fire('Lỗi!', 'Có lỗi xảy ra khi xóa phim.', 'error');
+        }
+      }
+    } else {
+      // Nếu phim đang inactive, xác nhận để kích hoạt lại phim
+      const result = await Swal.fire({
+        title: 'Bạn có chắc chắn muốn kích hoạt phim này?',
+        text: "Phim sẽ được hiển thị trở lại.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Kích hoạt',
+        cancelButtonText: 'Hủy'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await Movie_Service.ActiveMovie(movie.movieId); // Gọi hàm kích hoạt phim từ service
+          Swal.fire('Đã kích hoạt!', 'Phim đã được kích hoạt thành công.', 'success');
+          loadMovies(page * rowsPerPage, rowsPerPage); // Tải lại danh sách phim sau khi kích hoạt
+        } catch (error) {
+          Swal.fire('Lỗi!', 'Có lỗi xảy ra khi kích hoạt phim.', 'error');
+        }
+      }
+    }
+  };
+
+
   console.log("Response: ", movies);
   return (
     <Box sx={{ p: 2 }}>
@@ -299,36 +355,48 @@ const MovieManagement = () => {
           variant="outlined"
           size="small"
         />
+
         <FormControl fullWidth variant="outlined" size="small">
           <InputLabel>Thể Loại</InputLabel>
           <Select
             name="genre"
-            value={search.genre}
+            value={search.genre || ""}
             onChange={handleSearchChange}
             label="Thể Loại"
           >
             <MenuItem value="">Tất cả</MenuItem>
             {genres.map((genre) => (
-              <MenuItem key={genre.gerneId} value={genre.name}>
+              <MenuItem key={genre.genreId} value={genre.name}>
                 {genre.name}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
+
         <TextField
           label="Tìm kiếm theo diễn viên"
           name="actor"
-          value={search.actor}
+          value={search.actor || ""}
           onChange={handleSearchChange}
           fullWidth
           variant="outlined"
           size="small"
         />
+
         <Button
           variant="contained"
           color="primary"
           startIcon={<FaSearch />}
-          onClick={handleSearch}
+          onClick={handleSearch} // Chỉ gọi khi nhấn nút tìm kiếm
+        >
+          Tìm Kiếm
+        </Button>
+
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<FaSearch />}
+          onClick={handleSearch} // Chỉ gọi khi nhấn nút tìm kiếm
         >
           Tìm Kiếm
         </Button>
@@ -358,7 +426,13 @@ const MovieManagement = () => {
             {movies
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((movie, index) => (
-                <TableRow key={movie.movieId}> {/* Use movie.movieId as the unique key */}
+                <TableRow key={movie.movieId}
+                  style={{
+                    opacity: movie.isActive ? 1 : 0.5, // Giảm độ mờ nếu phim không hoạt động
+                    backgroundColor: movie.isActive ? "transparent" : "#f5f5f5", // Màu nền nhẹ nếu không hoạt động
+                  }}
+
+                >
                   <TableCell style={{ width: 100, height: 150 }}>
                     <img
                       src={movie.image}
@@ -386,11 +460,16 @@ const MovieManagement = () => {
                           <FaEdit />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip movieName="Xóa">
-                        <IconButton style={{ width: 'fit-content' }} color="error" onClick={() => handleDelete(movie.movieId)}>
-                          <FaTrashAlt />
+                      <Tooltip title="Xóa">
+                        <IconButton
+                          style={{ width: 'fit-content' }}
+                          color="error"
+                          onClick={() => handleMovieAction(movie)} // Gọi hàm xử lý hành động xóa
+                        >
+                          {movie.isActive ? <FaTrashAlt /> : <FaTicketAlt />}
                         </IconButton>
                       </Tooltip>
+
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -421,7 +500,7 @@ const MovieManagement = () => {
           justifyContent: "center",
           alignItems: "center",
         }}
-        
+
       >
         <Box
           sx={{
@@ -447,6 +526,7 @@ const MovieManagement = () => {
               fullWidth
               margin="normal"
             />
+
             <TextField
               label="Mô Tả"
               name="description"
@@ -457,11 +537,12 @@ const MovieManagement = () => {
               multiline
               rows={4}
             />
+
             <TextField
               label="Ngày Phát Hành"
               name="releaseDate"
               type="date"
-              value={editMovie ? formatDate(editMovie.releaseDate) : (newMovie.releaseDate ? formatDate(newMovie.releaseDate) : "")}
+              value={editMovie ? formatDate(editMovie.releaseDate) : formatDate(newMovie.releaseDate) || ""}
               onChange={handleInputChange}
               fullWidth
               margin="normal"
@@ -472,7 +553,6 @@ const MovieManagement = () => {
             <TextField
               label="Link Phim"
               name="movieUrl"
-              type="text"
               value={editMovie ? editMovie.movieUrl : newMovie.movieUrl || ""}
               onChange={handleInputChange}
               fullWidth
@@ -486,7 +566,7 @@ const MovieManagement = () => {
               <InputLabel>Trạng Thái</InputLabel>
               <Select
                 name="isActive"
-                value={editMovie ? editMovie.isActive : newMovie.isActive}
+                value={editMovie ? editMovie.isActive : newMovie.isActive || true}
                 onChange={handleInputChange}
                 label="Trạng Thái"
               >
@@ -533,25 +613,20 @@ const MovieManagement = () => {
               style={{ marginTop: 10 }}
             />
 
-            {/* Hiển thị ảnh preview khi chọn ảnh mới */}
-            {/* Hiển thị ảnh cũ khi chỉnh sửa phim */}
-            {/* {editMovie && editMovie.image && (
+            {editMovie && editMovie.image ? (
               <Box sx={{ marginTop: 2 }}>
                 <Typography variant="body2">Ảnh Preview:</Typography>
                 <img
-                  src={editMovie.image}  // Dùng URL ảnh hiện tại từ Cloudinary hoặc server
+                  src={editMovie.image}
                   alt="Movie image"
                   style={{ width: "100px", height: "auto", justifyContent: "center" }}
                 />
               </Box>
-            )} */}
-
-            {/* Hiển thị ảnh preview khi người dùng chọn ảnh mới */}
-            {newMovie.image && (
+            ) : newMovie.image && (
               <Box sx={{ marginTop: 2 }}>
                 <Typography variant="body2">Ảnh Preview:</Typography>
                 <img
-                  src={newMovie.image}  // Hiển thị ảnh mới chọn
+                  src={newMovie.image}
                   alt="Movie image"
                   style={{ width: "100px", height: "auto", justifyContent: "center" }}
                 />
