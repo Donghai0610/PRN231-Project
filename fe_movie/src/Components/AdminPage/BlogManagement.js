@@ -1,129 +1,87 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Button, Form, InputGroup, FormControl } from 'react-bootstrap';
-import { fetchData, updateData } from '../API/ApiService';
+import React, { useState } from 'react';
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tooltip } from '@mui/material';
+import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const BlogManagement = () => {
-  const [accounts, setAccounts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  
+  const [blogs, setBlogs] = useState([
+    {
+      blogId: 1,
+      title: "Review phim tóm tắt dành cho 'người lười'",
+      content: "https://example.com/content1",
+      movieId: 3,
+      datePosted: "2025-03-02T17:03:35.2626323",
+    },
+    {
+      blogId: 2,
+      title: "Diễn Viên Châu Tinh Trì quay lại đóng phim",
+      content: "https://example.com/content2",
+      movieId: 6,
+      datePosted: "2025-03-02T19:24:30.8308053",
+    },
+  ]);
 
-  useEffect(() => {
-    const loadAccounts = async () => {
-      try {
-        const data = await fetchData('accounts');
-        setAccounts(data);
-      } catch (error) {
-        console.error('Lỗi khi lấy dữ liệu tài khoản:', error);
-      }
-    };
-    loadAccounts();
-  }, []);
-  
+  const navigate = useNavigate();
 
-  const filterTickets = (ticket) => {
-    const lowerSearchTerm = searchTerm.toLowerCase();
-    return (
-      ticket.id.toLowerCase().includes(lowerSearchTerm) ||
-      ticket.movie.toLowerCase().includes(lowerSearchTerm) ||
-      ticket.cinema.toLowerCase().includes(lowerSearchTerm) ||
-      ticket.seats.toLowerCase().includes(lowerSearchTerm) ||
-      ticket.date.toLowerCase().includes(lowerSearchTerm) ||
-      ticket.startTime.toLowerCase().includes(lowerSearchTerm) ||
-      ticket.endTime.toLowerCase().includes(lowerSearchTerm)
-    );
+  const handleUpdate = (blogId) => {
+    // Chuyển đến trang update (có thể sử dụng state hoặc params để chỉ rõ blogId)
+    navigate(`/update/${blogId}`);
   };
 
-
-  const togglePaymentStatus = async (accountId, ticketId, status) => {
-    try {
-      await updateData('accounts', accountId, { 
-        tickets: accounts.find(account => account.id === accountId).tickets.map(ticket => 
-          ticket.id === ticketId ? { ...ticket, status: status === 'active' ? 'inactive' : 'active' } : ticket
-        )
-      });
-      
-    
-      setAccounts(accounts.map(account => 
-        account.id === accountId 
-          ? { ...account, tickets: account.tickets.map(ticket => 
-              ticket.id === ticketId ? { ...ticket, status: status === 'active' ? 'inactive' : 'active' } : ticket
-            ) } 
-          : account
-      ));
-    } catch (error) {
-      console.error('Lỗi khi thay đổi trạng thái thanh toán:', error);
-    }
-  };
-
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  const handleDelete = (blogId) => {
+    // Xóa blog từ dữ liệu (có thể gọi API)
+    setBlogs(blogs.filter((blog) => blog.blogId !== blogId));
   };
 
   return (
-    <div style={{ backgroundColor: '#f8f9fa', padding: '20px' }}>
-      <h2 style={{ color: '#343a40' }}>Quản Lý Vé</h2>
-      
-      <InputGroup className="mb-3">
-        <FormControl
-          placeholder="Tìm kiếm theo ID vé, Tên phim, Rạp, Ghế, Ngày"
-          aria-label="Search"
-          aria-describedby="basic-addon2"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </InputGroup>
-      <Table striped bordered hover responsive>
-        <thead className="table-dark">
-          <tr>
-            <th>ID Tài Khoản</th>
-            <th>Tên đầy đủ</th>
-            <th>Email</th>
-            <th>Số điện thoại</th>
-            <th>Mã Vé</th>
-            <th>Phim</th>
-            <th>Rạp</th>
-            <th>Ghế</th>
-            <th>Ngày</th>
-            <th>Thời gian</th>
-            <th>Tổng giá</th>
-            <th>Trạng thái</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          {accounts.map(account => (
-            account.tickets && account.tickets.length > 0 && account.tickets.filter(filterTickets).map(ticket => (
-              <tr key={ticket.id}>
-                <td>{account.id}</td>
-                <td>{account.full_name}</td>
-                <td>{account.email}</td>
-                <td>{account.phone}</td>
-                <td>{ticket.id}</td>
-                <td>{ticket.movie}</td>
-                <td>{ticket.cinema}</td>
-                <td>{ticket.seats.join(", ")}</td>
-                <td>{ticket.date}</td>
-                <td>{ticket.startTime} - {ticket.endTime}</td>
-                <td>{formatCurrency(ticket.totalPrice)}</td>
-                <td>
-                  <span className={`badge ${ticket.status === 'active' ? 'bg-success' : 'bg-danger'}`}>
-                    {ticket.status === 'active' ? 'Đã thanh toán' : 'Chưa thanh toán'}
-                  </span>
-                </td>
-                <td>
-                  <Button
-                    variant={ticket.status === 'active' ? 'outline-danger' : 'outline-success'}
-                    onClick={() => togglePaymentStatus(account.id, ticket.id, ticket.status)}
-                  >
-                    Chuyển trạng thái thanh toán
-                  </Button>
-                </td>
-              </tr>
-            ))
-          ))}
-        </tbody>
-      </Table>
+    <div style={{ padding: '20px' }}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => navigate('/add-blog')} // Điều hướng đến màn hình tạo mới bài viết
+        style={{ marginBottom: '20px' }}
+      >
+        Thêm Bài Viết Mới
+      </Button>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Blog ID</TableCell>
+              <TableCell>Title</TableCell>
+              <TableCell>Content</TableCell>
+              <TableCell>Movie ID</TableCell>
+              <TableCell>Date Posted</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {blogs.map((blog) => (
+              <TableRow key={blog.blogId}>
+                <TableCell>{blog.blogId}</TableCell>
+                <TableCell>{blog.title}</TableCell>
+                <TableCell>
+                  <a href={blog.content} target="_blank" rel="noopener noreferrer">Xem nội dung</a>
+                </TableCell>
+                <TableCell>{blog.movieId}</TableCell>
+                <TableCell>{new Date(blog.datePosted).toLocaleString()}</TableCell>
+                <TableCell>
+                  <Tooltip title="Update">
+                    <IconButton color="warning" onClick={() => handleUpdate(blog.blogId)}>
+                      <FaEdit />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <IconButton color="error" onClick={() => handleDelete(blog.blogId)}>
+                      <FaTrashAlt />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 };

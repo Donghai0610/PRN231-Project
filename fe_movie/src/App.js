@@ -21,6 +21,7 @@ import BlogManagement from "./Components/AdminPage/BlogManagement.js";
 import ActorManagement from "./Components/AdminPage/ActorManagement.js";
 import MovieManagement from "./Components/AdminPage/MovieManagement.js";
 import AdminDashBoard from "./Components/AdminPage/AdminDashBoard.js";
+import AddBlog from "./Components/AdminPage/component/AddBlog.js";
 
 // PrivateRoute component to handle authentication for all routes
 function PrivateRoute({ element, allowedRoles }) {
@@ -97,8 +98,15 @@ function App() {
             path="blog"
             element={<PrivateRoute element={<BlogManagement />} allowedRoles={["Admin"]} />}
           />
+          <Route
+            path="add-blog"
+            element={<PrivateRoute element={<AddBlog />} allowedRoles={["Admin"]} />}
+          />
         </Route>
-
+        <Route
+            path="add-blog"
+            element={<PrivateRoute element={<AddBlog />} allowedRoles={["Admin"]} />}
+          />
 
         {/* Other Public Routes */}
         <Route

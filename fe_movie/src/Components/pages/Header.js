@@ -170,7 +170,7 @@ function Header() {
                   id="admin-management-button"
                   className="nav-link"
                   as={Link}
-                  to="/admin"  // Chuyển hướng đến "/admin" khi nhấn vào button
+                  to="/admin/dashboard"  // Chuyển hướng đến "/admin" khi nhấn vào button
                 >
                   Quản Lý
                 </Button>
