@@ -2,37 +2,29 @@ import axiosInstance from "./axios";
 
 
 
-const GetAllMovies = async (genreName = null, actorName = null, movieName = null, skip = 0, top = 10) => {
+const GetAllMovies = async (genreName = null, actorName = null, movieName = null, skip = 0, top = 5) => {
     try {
-        // Xây dựng chuỗi filter OData
         let filter = '';
         
-        // Thêm bộ lọc thể loại nếu có
         if (genreName) {
             filter += `genres/any(g: g/name eq '${genreName}')`;
         }
 
-        // Thêm bộ lọc tên diễn viên nếu có
         if (actorName) {
-            if (filter) filter += ' and '; // Thêm 'and' nếu đã có bộ lọc trước đó
+            if (filter) filter += ' and '; 
             filter += `actors/any(a: contains(a/name, '${actorName}'))`;
         }
 
-        // Thêm bộ lọc tên phim nếu có
         if (movieName) {
-            if (filter) filter += ' and '; // Thêm 'and' nếu đã có bộ lọc trước đó
             filter += `contains(movieName, '${movieName}')`;
         }
 
-        // Xây dựng URL tùy thuộc vào việc có bộ lọc hay không
         let url = '/api/Movies';
 
-        // Nếu có filter, thêm tham số $filter vào URL
         if (filter) {
             url += `?$filter=${filter}`;
         }
 
-        // Thêm tham số phân trang vào URL (Sửa từ $stop thành $top)
         if (!filter) {
             url += `?$skip=${skip}&$top=${top}`;
         } else {
@@ -40,10 +32,9 @@ const GetAllMovies = async (genreName = null, actorName = null, movieName = null
             url += `&$skip=${skip}&$top=${top}`;
         }
 
-        // Gửi yêu cầu GET sử dụng axiosInstance
         const response = await axiosInstance.get(url);
 
-        return response.data;  // Trả về dữ liệu từ API
+        return response;  
     } catch (error) {
         console.error('Lỗi khi lấy dữ liệu phim:', error);
         return [];

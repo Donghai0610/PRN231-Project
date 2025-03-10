@@ -68,35 +68,43 @@ const MovieManagement = () => {
         console.error("Error loading genres or actors:", error);
       }
 
-      // Load movies first time without any filter
       await loadMovies();
     };
 
     loadMoviesAndGenres();
-  }, []);
+  }, [search, page,rowsPerPage  ]);
 
-  const loadMovies = async (skip = 0, rowsPerPage = 5) => {
+  const loadMovies = async (skip = 0, rowsPerPage = 100) => {
     const { movieName, genre, actor } = search;
-
     try {
-      const allMoviesResponse = await axiosInstance.get("/api/Movies"); // Không phân trang
+      // Đầu tiên, lấy tổng số phim (không phân trang)
+      const allMoviesResponse = await axiosInstance.get("/api/Movies");
       const totalItems = allMoviesResponse.data.length;
       setTotalMoviesCount(totalItems);
-
-      const response = await Movie_Service.GetAllMovies(genre, actor, movieName, skip, rowsPerPage); // Dùng skip cho phân trang
-
-      setMovies(response);
+  
+      // Sau đó, lấy dữ liệu phân trang
+      const response = await Movie_Service.GetAllMovies(genre, actor, movieName, skip, rowsPerPage);
+      setMovies(response.data);  // Cập nhật lại danh sách phim
+  
     } catch (error) {
       console.error("Lỗi khi lấy phim:", error);
     }
   };
+  
 
   const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-    const skip = newPage * rowsPerPage;
-    loadMovies(skip, rowsPerPage);
+    setPage(newPage);  // Cập nhật lại trang hiện tại
+    const skip = newPage * rowsPerPage;  // Tính toán số lượng item bỏ qua dựa trên số trang
+    loadMovies(skip, rowsPerPage);  // Gọi lại hàm loadMovies với tham số mới
   };
-
+  
+  const handleChangeRowsPerPage = (event) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
+    setRowsPerPage(newRowsPerPage);  // Cập nhật số dòng mỗi trang
+    setPage(0);  // Quay lại trang đầu tiên
+    loadMovies(0, newRowsPerPage);  // Gọi lại loadMovies với số dòng mới và trang đầu tiên
+  };
+  
 
   const handleSearchChange = (e) => {
     const { name, value } = e.target;
@@ -107,11 +115,7 @@ const MovieManagement = () => {
     loadMovies();
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-    loadMovies();
-  };
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -176,55 +180,59 @@ const MovieManagement = () => {
   };
 
   const handleSubmit = async () => {
-    // Kiểm tra nếu không có ảnh mới, chỉ khi thêm phim mới mới cần kiểm tra ảnh
     if (!newMovie.image && !editMovie) {
       toast.error("Vui lòng chọn ảnh cho phim!");
       return;
     }
+  
     let finalActors = editMovie
       ? editMovie.actors.map(a => a.actorId)
       : newMovie.actors.map(a => a.actorId);
-
+  
     let finalGenres = editMovie
       ? editMovie.genres.map(g => g.genreId)
       : newMovie.genres.map(g => g.genreId);
-
-
-      const updatedMovieData = {
+  
+    const updatedMovieData = {
       ...newMovie,
-      image: newMovie.image || editMovie?.image,  // Use the image if provided, else use existing
+      image: newMovie.image || editMovie?.image, 
       actors: finalActors,
       genres: finalGenres,
     };
-
+  
     try {
       let imageToUpload = updatedMovieData.image;
-
-      // If the image is unchanged, we don't upload it again
+  
       if (updatedMovieData.image === editMovie?.image) {
         imageToUpload = null;
       }
+  
       console.log("Update : " + updatedMovieData.actors.length);
-      // Cập nhật phim nếu đang chỉnh sửa
+  
       if (editMovie) {
         await Movie_Service.UpdateMovie(editMovie.movieId, updatedMovieData);
         setMovies(movies.map((movie) =>
-          movie.id === editMovie.id ? { ...updatedMovieData, id: editMovie.id } : movie
+          movie.movieId === editMovie.movieId ? { ...updatedMovieData, movieId: editMovie.movieId } : movie
         ));
         toast.success("Đã cập nhật phim thành công!");
       } else {
         // Thêm phim mới
         const createdMovie = await Movie_Service.CreateMovie(updatedMovieData);
-        setMovies([...movies, { ...createdMovie, id: movies.length + 1 }]);
+        setMovies([...movies, { ...createdMovie, movieId: movies.length + 1 }]);
         toast.success("Đã thêm phim mới thành công!");
       }
-
+  
+      // Đóng modal sau khi thao tác xong
       setShowModal(false);
+      
+      loadMovies(page * rowsPerPage, rowsPerPage);
+  
     } catch (error) {
       console.error("Error submitting movie:", error);
+      toast.error("Có lỗi xảy ra khi thêm hoặc cập nhật phim!" + error.message);
     }
   };
-
+  
 
 
   const handleEdit = (movie) => {
@@ -272,6 +280,7 @@ const MovieManagement = () => {
     const date = new Date(dateString);
     return date.toISOString().split('T')[0];  // Chỉ lấy phần ngày "yyyy-MM-dd"
   };
+  console.log("Response: ", movies);
   return (
     <Box sx={{ p: 2 }}>
       <ToastContainer position="top-right" autoClose={2000} hideProgressBar />
@@ -349,8 +358,7 @@ const MovieManagement = () => {
             {movies
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((movie, index) => (
-                <TableRow key={`${movie.movieId}-${index}`}>  {/* Kết hợp movieId và index */}
-
+                <TableRow key={movie.movieId}> {/* Use movie.movieId as the unique key */}
                   <TableCell style={{ width: 100, height: 150 }}>
                     <img
                       src={movie.image}
@@ -358,8 +366,10 @@ const MovieManagement = () => {
                       style={{ objectFit: "cover", width: 100, height: 150 }}
                     />
                   </TableCell>
-                  <TableCell style={{ fontFamily: 'cursive', fontSize: '20px' }} >{movie.movieName}</TableCell>
-                  <TableCell style={{ fontFamily: 'cursive', fontSize: '20px' }} >
+                  <TableCell style={{ fontFamily: 'cursive', fontSize: '20px' }}>
+                    {movie.movieName}
+                  </TableCell>
+                  <TableCell style={{ fontFamily: 'cursive', fontSize: '20px' }}>
                     {movie.actors && movie.actors.length > 0
                       ? movie.actors.map((actor) => actor.fullName).join(", ")
                       : "Không có diễn viên"}
@@ -372,22 +382,22 @@ const MovieManagement = () => {
                   <TableCell style={{ fontFamily: 'cursive', fontSize: '20px' }}>
                     <Box sx={{ display: "flex", gap: 1 }}>
                       <Tooltip movieName="Sửa">
-                        <IconButton style={{ width: 'fit-content' }}
-                          color="warning" onClick={() => handleEdit(movie)}>
+                        <IconButton style={{ width: 'fit-content' }} color="warning" onClick={() => handleEdit(movie)}>
                           <FaEdit />
                         </IconButton>
                       </Tooltip>
                       <Tooltip movieName="Xóa">
-                        <IconButton style={{ width: 'fit-content' }} color="error" onClick={() => handleDelete(movie.id)}>
+                        <IconButton style={{ width: 'fit-content' }} color="error" onClick={() => handleDelete(movie.movieId)}>
                           <FaTrashAlt />
                         </IconButton>
                       </Tooltip>
                     </Box>
                   </TableCell>
-
                 </TableRow>
               ))}
           </TableBody>
+
+
         </Table>
 
         {/* Pagination */}
@@ -411,6 +421,7 @@ const MovieManagement = () => {
           justifyContent: "center",
           alignItems: "center",
         }}
+        
       >
         <Box
           sx={{
@@ -419,6 +430,8 @@ const MovieManagement = () => {
             borderRadius: 1,
             maxWidth: 600,
             width: "100%",
+            maxHeight: "80vh", // Giới hạn chiều cao modal (80% chiều cao màn hình)
+            overflowY: "auto", // Cho phép cuộn theo chiều dọc
           }}
         >
           <Typography variant="h6" id="modal-movieName" textAlign="center">
