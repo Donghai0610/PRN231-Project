@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ckeditor/ckeditor5-react": "^9.5.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.7",
@@ -40,7 +41,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "npm-run-all --parallel server start-react node-server",
+    "start": "react-scripts start",
     "start-react": "react-scripts start",
     "server": "json-server --watch database.json --port 3001",
     "node-server": "cd src/Components/API && node server.js",

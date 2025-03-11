@@ -1,245 +1,53 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Container, Row, Col, Form, Button, Modal, Table } from "react-bootstrap";
-import { fetchData, updateData } from "../API/ApiService";
-import { PencilSquare, Lock, Key } from 'react-bootstrap-icons';
-import { InputGroup, FormControl } from 'react-bootstrap';
+import { useState } from "react";
+import { Container, Row, Col, Form, Button, Modal } from "react-bootstrap";
+import { Lock } from "react-bootstrap-icons";
+import { InputGroup, FormControl } from "react-bootstrap";
 
 function UserProfile() {
-  const { id } = useParams();
-  const [show, setShow] = useState(false);
-  const [accounts, setAccounts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
-    full_name: "",
-    email: "",
-    phone: "",
-    dob: "",
-    address: "",
-    gender: "",
+    full_name: '',
+    email: '',
+    phone: '',
+    dob: '',
+    address: '',
   });
   const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-  const [userData, setUserData] = useState(null);
+  const [show, setShow] = useState(false);
   const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
-  useEffect(() => {
-    const getUserData = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchData(`accounts/${id}`);
-        setUserData(data);
-        setFormData({
-          full_name: data.full_name,
-          email: data.email,
-          phone: data.phone,
-          dob: data.dob,
-          address: data.address,
-          gender: data.gender,
-        });
 
-        const userTickets = data.tickets || [];
-        setAccounts(userTickets);
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getUserData();
-  }, [id]);
-
-  const filterTickets = (ticket) => {
-    const lowerSearchTerm = searchTerm.toLowerCase();
-    return (
-      ticket.id.toLowerCase().includes(lowerSearchTerm) ||
-      ticket.movie.toLowerCase().includes(lowerSearchTerm) ||
-      ticket.cinema.toLowerCase().includes(lowerSearchTerm) ||
-      ticket.seats.toLowerCase().includes(lowerSearchTerm) ||
-      ticket.date.toLowerCase().includes(lowerSearchTerm) ||
-      ticket.startTime.toLowerCase().includes(lowerSearchTerm) ||
-      ticket.endTime.toLowerCase().includes(lowerSearchTerm)
-    );
-  };
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-  };
-  const handleClose = () => {
-    setShow(false);
-    setPasswordData({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-    setErrors({});
-  };
-  const [successMessage, setSuccessMessage] = useState("");
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const handleShow = () => setShow(true);
-  const handleModalClose = () => {
-    setShowSuccessModal(false);
-    setSuccessMessage("");
-  };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === "email") {
-      setFormData({
-        ...formData,
-        [name]: value.toLowerCase(),
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
-
-    setErrors({ ...errors, [name]: "" });
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
-    setPasswordData({
-      ...passwordData,
+    setPasswordData((prevData) => ({
+      ...prevData,
       [name]: value,
-    });
-    setErrors({ ...errors, [name]: "" });
+    }));
   };
 
-  const validateFields = () => {
-    const validationErrors = {};
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const phoneRegex = /^0\d{9,10}$/;
-    const today = new Date();
-
-    if (!formData.full_name) validationErrors.full_name = "Họ và tên không được bỏ trống!";
-    if (!formData.gender) validationErrors.gender = "Giới tính không được bỏ trống!";
-
-    if (!formData.email) {
-      validationErrors.email = "Email không được bỏ trống!";
-    } else if (!emailRegex.test(formData.email)) {
-      validationErrors.email = "Email không đúng định dạng! (....@gmail.com)";
-    }
-
-    if (!formData.phone) {
-      validationErrors.phone = "Số điện thoại không được bỏ trống!";
-    } else if (!phoneRegex.test(formData.phone)) {
-      validationErrors.phone = "Số điện thoại không đúng định dạng! (Bắt đầu bằng số 0 và 10-11 số)";
-    }
-
-    if (!formData.dob) {
-      validationErrors.dob = "Ngày sinh không được bỏ trống!";
-    } else if (new Date(formData.dob) > today) {
-      validationErrors.dob = "Ngày sinh không được là ngày sau hôm nay!";
-    }
-
-    if (!formData.address) validationErrors.address = "Địa chỉ không được bỏ trống!";
-
-    setErrors(validationErrors);
-    return Object.keys(validationErrors).length === 0;
-  };
-
-  const validatePasswordFields = () => {
-    const validationErrors = {};
-
-    if (!passwordData.currentPassword) {
-      validationErrors.currentPassword = "Mật khẩu hiện tại không được bỏ trống!";
-    } else if (passwordData.currentPassword !== userData.password) {
-      validationErrors.currentPassword = "Mật khẩu hiện tại không đúng.";
-    }
-
-    if (!passwordData.newPassword) {
-      validationErrors.newPassword = "Mật khẩu mới không được bỏ trống!";
-    } else if (passwordData.newPassword.length < 8) {
-      validationErrors.newPassword = "Mật khẩu phải có ít nhất 8 ký tự!";
-    }
-
-    if (!passwordData.confirmPassword) {
-      validationErrors.confirmPassword = "Xác nhận mật khẩu không được bỏ trống!";
-    } else if (passwordData.newPassword !== passwordData.confirmPassword) {
-      validationErrors.confirmPassword = "Mật khẩu mới và xác nhận mật khẩu không trùng khớp.";
-    }
-
-    setErrors(validationErrors);
-    return Object.keys(validationErrors).length === 0;
-  };
-
-  const getUserData = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchData(`accounts/${id}`);
-      setUserData(data);
-      setFormData({
-        full_name: data.full_name,
-        email: data.email,
-        phone: data.phone,
-        dob: data.dob,
-        address: data.address,
-        gender: data.gender,
-      });
-    } catch (error) {
-      console.error("Failed to fetch user data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validateFields()) return;
-    setUpdating(true);
-    try {
-      const updatedData = {
-        ...userData,
-        ...formData,
-      };
-      await updateData("accounts", id, updatedData);
-      setSuccessMessage("Cập nhật thành công!");
-      setShowSuccessModal(true);
-      await getUserData();
-    } catch (error) {
-      console.error("Failed to update profile:", error);
-      setSuccessMessage("Có lỗi xảy ra, vui lòng thử lại.");
-      setShowSuccessModal(true);
-    } finally {
-      setUpdating(false);
-    }
+    // Handle form submission logic here, like validation and API call
   };
 
-  const handlePasswordSubmit = async (e) => {
+  const handlePasswordSubmit = (e) => {
     e.preventDefault();
-    if (!validatePasswordFields()) return;
-    setUpdating(true);
-    try {
-      const updatedData = {
-        ...userData,
-        password: passwordData.newPassword,
-      };
-      await updateData("accounts", id, updatedData);
-      setSuccessMessage("Đổi mật khẩu thành công!");
-      setShowSuccessModal(true);
-      handleClose();
-    } catch (error) {
-      console.error("Failed to update password:", error);
-      setSuccessMessage("Có lỗi xảy ra khi cập nhật mật khẩu.");
-      setShowSuccessModal(true);
-    } finally {
-      setUpdating(false);
-    }
+    // Handle password change logic here
   };
 
-  useEffect(() => {
-    getUserData();
-  }, [id]);
-
-  if (loading) {
-    return <div>Đang tải dữ liệu...</div>;
-  }
+  const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
 
   return (
     <div className="center">
@@ -317,24 +125,6 @@ function UserProfile() {
                     {errors.address}
                   </Form.Control.Feedback>
                 </Col>
-                <Col md={6}>
-                  <Form.Label>Giới tính</Form.Label>
-                  <Form.Control
-                    as="select"
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleInputChange}
-                    isInvalid={!!errors.gender}
-                  >
-                    <option value="">Chọn giới tính</option>
-                    <option value="Nam">Nam</option>
-                    <option value="Nữ">Nữ</option>
-                    <option value="Khác">Khác</option>
-                  </Form.Control>
-                  <Form.Control.Feedback type="invalid">
-                    {errors.gender}
-                  </Form.Control.Feedback>
-                </Col>
               </Row>
 
               <Row style={{ marginTop: "2rem" }}>
@@ -361,59 +151,6 @@ function UserProfile() {
               </Row>
             </Form>
           </Col>
-        </Row>
-        <Row style={{ marginTop: "2rem" }}>
-          <div style={{ backgroundColor: '#f8f9fa', padding: '20px' }}>
-            <h2 style={{ color: '#343a40' }}>Lịch Sử Dặt Vé</h2>
-
-            <InputGroup className="mb-3">
-              <FormControl
-                placeholder="Tìm kiếm theo ID vé, Tên phim, Rạp, Ghế, Ngày"
-                aria-label="Search"
-                aria-describedby="basic-addon2"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </InputGroup>
-            <Table striped bordered hover responsive>
-              <thead className="table-dark">
-                <tr>
-                  <th>Mã Vé</th>
-                  <th>Phim</th>
-                  <th>Rạp</th>
-                  <th>Ghế</th>
-                  <th>Ngày</th>
-                  <th>Thời gian</th>
-                  <th>Tổng giá</th>
-                  <th>Trạng thái</th>
-                </tr>
-              </thead>
-              <tbody>
-                {accounts.length > 0 ? (
-                  accounts.filter(filterTickets).map(ticket => (
-                    <tr key={ticket.id}>
-                      <td>{ticket.id}</td>
-                      <td>{ticket.movie}</td>
-                      <td>{ticket.cinema}</td>
-                      <td>{ticket.seats.join(", ")}</td>
-                      <td>{ticket.date}</td>
-                      <td>{ticket.startTime} - {ticket.endTime}</td>
-                      <td>{formatCurrency(ticket.totalPrice)}</td>
-                      <td>
-                        <span className={`badge ${ticket.status === 'active' ? 'bg-success' : 'bg-danger'}`}>
-                          {ticket.status === 'active' ? 'Đã thanh toán' : 'Chưa thanh toán'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="8" className="text-center">Không có vé nào.</td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
-          </div>
         </Row>
       </Container>
 
@@ -494,19 +231,7 @@ function UserProfile() {
         </Modal.Body>
       </Modal>
 
-      <Modal centered show={showSuccessModal} onHide={handleModalClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Thông báo</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{successMessage}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleModalClose}>
-            Đóng
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </div>
-
   );
 }
 

@@ -14,11 +14,9 @@ function Header() {
   const location = useLocation();
 
   const updateUserData = () => {
-    // Check if token and account are in localStorage
     const token = localStorage.getItem("token");
     const account = localStorage.getItem("account");
 
-    // If both token and account exist, the user is logged in
     if (token && account) {
       const decodedToken = jwtDecode(token);
       setIsLoggedIn(true);
@@ -152,8 +150,8 @@ function Header() {
               </Nav.Link>
               <Nav.Link
                 as={Link}
-                to={"/info"}
-                className={isActive("/info")}
+                to={"/blog-review"}
+                className={isActive("/blog-review")}
               >
                 Blog
               </Nav.Link>

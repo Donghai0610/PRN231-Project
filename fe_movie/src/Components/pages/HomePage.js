@@ -6,39 +6,49 @@ import { Modal, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 function HomePage() {
-  const [data, setData] = useState([]);
-  const [movieType, setMovieType] = useState([]);
-  const [genres, setGenres] = useState([]);
+  const [data, setData] = useState([
+    {
+      id: 1,
+      title: "Movie 1",
+      banner: "https://via.placeholder.com/1200x500",
+      poster: "https://via.placeholder.com/200x300",
+      genre_ids: [1, 2],
+      video_url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      duration: 120,
+      release_date: "2024-12-01",
+    },
+    {
+      id: 2,
+      title: "Movie 2",
+      banner: "https://via.placeholder.com/1200x500",
+      poster: "https://via.placeholder.com/200x300",
+      genre_ids: [2, 3],
+      video_url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      duration: 110,
+      release_date: "2024-11-15",
+    },
+  ]);
+  const [movieType, setMovieType] = useState([
+    { id: 1, name: "Action" },
+    { id: 2, name: "Comedy" },
+    { id: 3, name: "Drama" },
+  ]);
+  const [genres, setGenres] = useState([
+    { id: 1, name: "Action" },
+    { id: 2, name: "Comedy" },
+    { id: 3, name: "Drama" },
+  ]);
   const [selectedMovieType, setSelectedMovieType] = useState(1);
 
   const [showModal, setShowModal] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
   const [selectedMovie, setSelectedMovie] = useState(null);
 
-  useEffect(() => {
-    fetch("http://localhost:3001/movies")
-      .then((response) => response.json())
-      .then((data) => setData(data))
-      .catch((error) => console.error("Error fetching movies:", error));
-
-    fetch("http://localhost:3001/genres")
-      .then((response) => response.json())
-      .then((data) => setGenres(data))
-      .catch((error) => console.error("Error fetching genres:", error));
-
-    fetch("http://localhost:3001/movietypes")
-      .then((response) => response.json())
-      .then((data) => setMovieType(data))
-      .catch((error) => console.error("Error fetching movie types:", error));
-  }, []);
-
   const handleMovieTypeFilter = (type) => {
     setSelectedMovieType(type.id);
   };
 
-  const filteredData = data.filter(
-    (movie) => movie.movie_type == selectedMovieType
-  );
+  const filteredData = data.filter((movie) => movie.movie_type == selectedMovieType);
 
   const getGenreNames = (genreIds) =>
     genreIds
@@ -100,9 +110,7 @@ function HomePage() {
                   <div className="image-container">
                     <img
                       style={{ height: "400px" }}
-                      src={
-                        movie.poster || "https://via.placeholder.com/200x300"
-                      }
+                      src={movie.poster || "https://via.placeholder.com/200x300"}
                       alt={movie.title}
                     />
                     <div
@@ -121,8 +129,7 @@ function HomePage() {
                       <span>Thời lượng:</span> {movie.duration || "N/A"} phút
                     </li>
                     <li>
-                      <span>Ngày sản chiếu:</span>{" "}
-                      {movie.release_date || "N/A"}
+                      <span>Ngày sản chiếu:</span> {movie.release_date || "N/A"}
                     </li>
                   </ul>
                 </div>

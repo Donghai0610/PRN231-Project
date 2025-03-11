@@ -3,8 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-
 import jwt_decode, { jwtDecode } from "jwt-decode";
 import Header from "./Components/pages/Header";
 import Footer from "./Components/pages/Footer";
-import CinemaInfo from "./Components/pages/CinemaInfo";
-import TicketPricing from "./Components/pages/TicketPricing";
 import LoginRegister from "./Components/pages/LoginRegister.js";
 import LanguagesManager from "./Components/AdminPage/AdminDashBoard.js";
 import GenresManager from "./Components/AdminPage/GenresManager.js";
@@ -12,8 +10,6 @@ import Page404 from "./Components/pages/Page404.js";
 import HomePage from "./Components/pages/HomePage.js";
 import MovieDetail from "./Components/pages/MovieDetail.js";
 import AccountManager from "./Components/AdminPage/AccountManager.js";
-import ShowTime from "./Components/pages/ShowtimePage.js";
-import Booking from "./Components/pages/Booking.js";
 import UserProfile from "./Components/pages/UserProfile.js";
 import { ToastContainer } from "react-toastify";
 import AdminSidebar from "./Components/pages/AdminSidebar.js";
@@ -22,7 +18,9 @@ import ActorManagement from "./Components/AdminPage/ActorManagement.js";
 import MovieManagement from "./Components/AdminPage/MovieManagement.js";
 import AdminDashBoard from "./Components/AdminPage/AdminDashBoard.js";
 import AddBlog from "./Components/AdminPage/component/AddBlog.js";
-
+import UpdateBlog from "./Components/AdminPage/component/UpdateBLog.js";
+import MovieList from "./Components/pages/MovieList.js";
+import BlogReview from "./Components/pages/BlogReview.js";
 // PrivateRoute component to handle authentication for all routes
 function PrivateRoute({ element, allowedRoles }) {
   const token = localStorage.getItem("token");
@@ -102,13 +100,19 @@ function App() {
             path="add-blog"
             element={<PrivateRoute element={<AddBlog />} allowedRoles={["Admin"]} />}
           />
-        </Route>
-        <Route
-            path="add-blog"
-            element={<PrivateRoute element={<AddBlog />} allowedRoles={["Admin"]} />}
+          <Route
+            path="update-blog/:id"
+            element={<PrivateRoute element={<UpdateBlog  />} allowedRoles={["Admin"]} />}
           />
-
+      
+        </Route>
+       
+        {/* <Route
+            path="/add-blog"
+            element={<PrivateRoute element={<AddBlog />} allowedRoles={["Admin"]} />}
+          /> */}
         {/* Other Public Routes */}
+
         <Route
           path="/"
           element={<PrivateRoute element={<HomePage />} allowedRoles={["Admin", "Customer"]} />}
@@ -117,22 +121,16 @@ function App() {
           path="/movie/:id"
           element={<PrivateRoute element={<MovieDetail />} allowedRoles={["Admin", "Customer"]} />}
         />
+      
         <Route
-          path="/info"
-          element={<PrivateRoute element={<CinemaInfo />} allowedRoles={["Admin", "Customer"]} />}
+          path="/movie"
+          element={<PrivateRoute element={<MovieList />} allowedRoles={["Admin", "Customer"]} />}
         />
         <Route
-          path="/price"
-          element={<PrivateRoute element={<TicketPricing />} allowedRoles={["Admin", "Customer"]} />}
+          path="/blog-review"
+          element={<PrivateRoute element={<BlogReview />} allowedRoles={["Admin", "Customer"]} />}
         />
-        <Route
-          path="/showtime"
-          element={<PrivateRoute element={<ShowTime />} allowedRoles={["Admin", "Customer"]} />}
-        />
-        <Route
-          path="/booking/:id"
-          element={<PrivateRoute element={<Booking />} allowedRoles={["Admin", "Customer"]} />}
-        />
+       
         <Route
           path="/profile/:id"
           element={<PrivateRoute element={<UserProfile />} allowedRoles={["Admin", "Customer"]} />}

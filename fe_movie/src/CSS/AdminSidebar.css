@@ -1,7 +1,7 @@
 /* AdminSidebar.css */
 .sidebar-link {
     text-decoration: none;  /* Bỏ gạch chân mặc định */
-    color: #007bff; /* Màu chữ mặc định cho liên kết */
+    color: black; /* Màu chữ mặc định cho liên kết */
     font-weight: bold;
   }
   
@@ -24,3 +24,16 @@
     color: #007bff; /* Màu khi item được chọn */
   }
   
+  @media (max-width: 768px) {
+    .sidebar-link {
+      font-size: 14px;
+    }
+  }
+  .main-content {
+    padding: 20px;
+    flex: 1;
+  }
+  .sb-button {
+    font-size: 24px;
+    cursor: pointer;
+  }

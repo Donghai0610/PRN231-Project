@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button, Form, InputGroup, Modal, Toast, ToastContainer } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { postData, fetchData } from "../API/ApiService";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../CSS/LoginRegister.css";
 import Auth_Services from "../../services/auth";
@@ -160,63 +159,12 @@ const LoginRegister = () => {
   const handleForgotPassword = async (e) => {
     e.preventDefault();
 
-    if (!email.trim()) {
-      setErrorMessage("Email không được để trống");
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      const response = await fetch("http://localhost:5000/api/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setPopupContent({
-          title: "Yêu cầu thành công",
-          message: data.message || "Yêu cầu đặt lại mật khẩu đã được gửi.",
-        });
-        setPopupVisible(true);
-        setCurrentForm("resetPassword");
-      } else {
-        setErrorMessage(data.message || "Đã xảy ra lỗi khi gửi yêu cầu!");
-      }
-    } catch (error) {
-      console.error("Error in forgot password:", error);
-      setErrorMessage("Không thể kết nối đến server, vui lòng thử lại.");
-    } finally {
-      setIsSubmitting(false); // Hoàn tất, kích hoạt lại nút
-    }
+    
   };
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    const isValid = validateResetPassword();
-    if (!isValid) return;
-    try {
-      const response = await fetch("http://localhost:5000/api/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), resetToken, newPassword }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setPopupContent({
-          title: "Thay đổi thành công",
-          message: data.message || "Mật khẩu đã được thay đổi.",
-        });
-        setPopupVisible(true);
-        setCurrentForm("login");
-      } else {
-        setErrorMessage(data.message || "Đã xảy ra lỗi khi thay đổi mật khẩu!");
-      }
-    } catch (error) {
-      console.error("Error resetting password:", error);
-      setErrorMessage("Không thể kết nối đến server, vui lòng thử lại.");
-    }
+   
   };
   const handleCancel = () => {
     setEmail("");

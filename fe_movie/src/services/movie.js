@@ -209,6 +209,15 @@ const CreateMovie = async (movie) => {
     }
   };
   
+const GetMovieTop4 = async () => {
+  try {
+    const response = await axiosInstance.get('/api/Movies?top=4&skip=6');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching top 4 movies:", error);
+    throw error;
+  }
+};
 
 const Movie_Service = {
     GetAllMovies,
@@ -216,6 +225,7 @@ const Movie_Service = {
     CreateMovie,
     UpdateMovie,
     DeleteMovie,
-    ActiveMovie
+    ActiveMovie,
+    GetMovieTop4
 }
 export default Movie_Service;

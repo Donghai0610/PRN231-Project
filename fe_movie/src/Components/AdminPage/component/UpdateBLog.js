@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Link, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import EditorComponent from './EditorComponent';
 import BlogService from '../../../services/blog';
-import MovieService from '../../../services/movie';  // Đảm bảo có một MovieService để gọi API Movies
 import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode';
 import axiosInstance from '../../../services/axios';
-const AddBlog = () => {
+
+const UpdateBlog = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [movieId, setMovieId] = useState('');
@@ -15,6 +15,7 @@ const AddBlog = () => {
   const [appUserId, setAppUserId] = useState(null);
   const [movies, setMovies] = useState([]); // Lưu danh sách phim
   const navigate = useNavigate();
+  const { id } = useParams();
 
   // Giải mã token và lấy appUserId
   useEffect(() => {
@@ -40,9 +41,39 @@ const AddBlog = () => {
     fetchMovies();
   }, []);
 
+  // Fetch blog data by ID
+  const fetchHtmlContent = async (url) => {
+    try {
+      const response = await fetch(url); // Assuming the URL points to the raw HTML file
+      if (response.ok) {
+        const htmlContent = await response.text();
+        setContent(htmlContent); // Load the content into CKEditor
+      } else {
+        throw new Error('Failed to fetch HTML content');
+      }
+    } catch (error) {
+      console.error('Error fetching HTML content:', error);
+    }
+  };
+
+  const fetchBlog = async () => {
+    try {
+      const response = await BlogService.getBlogById(id);
+      setTitle(response.title);
+      setMovieId(response.movieId);
+      setDatePosted(new Date(response.datePosted).toISOString().slice(0, 16)); // Format for datetime-local input
+      fetchHtmlContent(response.content); // Fetch the HTML content and load it into CKEditor
+    } catch (error) {
+      console.error('Error fetching blog:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBlog();
+  }, [id]);
+
   const handleEditorChange = (data) => {
     setContent(data);
-    console.log("Editor content:", data);
   };
 
   const handleSubmit = async () => {
@@ -52,34 +83,33 @@ const AddBlog = () => {
         return;
       }
 
-      console.log("Content being sent:", content);
-
       const blogData = {
         title,
         content,
-        movieId: parseInt(movieId), // Dùng movieId từ dropdown
+        movieId: parseInt(movieId),
         appUserId,
       };
 
-      await BlogService.createBlog(blogData);
-      toast.success('Thêm bài viết thành công!');
+      // Call the updateBlog function to update the blog
+      await BlogService.updateBlog(id, blogData);
+      toast.success('Cập nhật bài viết thành công!');
 
-      // Chuyển hướng sau 2 giây
+      // Redirect after a short delay
       setTimeout(() => {
         navigate('/admin/blog');
       }, 2000);
     } catch (error) {
-      toast.error('Có lỗi xảy ra khi thêm bài viết: ' + error.message);
+      toast.error('Có lỗi xảy ra khi cập nhật bài viết: ' + error.message);
     }
   };
 
   return (
     <div style={{ padding: '20px' }}>
       <Link href="/admin/blog" style={{ fontSize: '14px', marginBottom: '10px', display: 'inline-block' }}>
-        Quản lý Blog  &gt; Thêm bài blog
+        Quản lý Blog &gt; Cập nhật bài blog
       </Link>
 
-      <h2>Thêm Bài Viết Mới</h2>
+      <h2>Cập nhật Bài Viết</h2>
 
       <TextField
         label="Tiêu đề"
@@ -116,9 +146,8 @@ const AddBlog = () => {
         }}
       />
 
-        
       {/* CKEditor for Content */}
-      <EditorComponent  content={content} setContent={handleEditorChange} />
+      <EditorComponent content={content} setContent={handleEditorChange} />
 
       <Button
         variant="contained"
@@ -126,10 +155,10 @@ const AddBlog = () => {
         onClick={handleSubmit}
         style={{ marginTop: '20px' }}
       >
-        Thêm Bài Viết
+        Cập nhật Bài Viết
       </Button>
     </div>
   );
 };
 
-export default AddBlog;
+export default UpdateBlog;
