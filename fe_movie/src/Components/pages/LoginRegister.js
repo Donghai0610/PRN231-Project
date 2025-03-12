@@ -44,14 +44,13 @@ const LoginRegister = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Step 1: Validate user input (optional but a good practice)
     if (!email || !password) {
-      toast.error("Email và mật khẩu không được để trống!"); // Show error toast
+      toast.error("Email và mật khẩu không được để trống!");
       return;
     }
 
     try {
-      const response = await Auth_Services.loginHandle(email, password);  // Call the login API
+      const response = await Auth_Services.loginHandle(email, password);
 
       if (response && response.data) {
         localStorage.setItem("token", response.data);
@@ -64,14 +63,16 @@ const LoginRegister = () => {
           localStorage.removeItem("rememberedAccount");
         }
 
-        window.location.replace("/");
+        toast.success("Đăng nhập thành công!");
+        setTimeout(() => {
+          window.location.replace("/");
+        }, 1500);
       } else {
         toast.error("Đăng nhập thất bại, vui lòng thử lại!");
       }
     } catch (error) {
-      // Log the error and display the exact error message
-      console.error("Error during login:", error.response?.data || error.message);
-      toast.error(error.response?.data);  // Display the exact error message from the response
+      console.error("Lỗi đăng nhập:", error.response?.data || error.message);
+      toast.error(error.response?.data || "Đã xảy ra lỗi khi đăng nhập");
     }
   };
 
@@ -79,29 +80,28 @@ const LoginRegister = () => {
     const resetValidationErrors = {};
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!resetToken) {
-      resetValidationErrors.resetToken = "Token không được bỏ trống!"
+      resetValidationErrors.resetToken = "Mã xác nhận không được bỏ trống!"
     }
     if (!newPassword) {
-      resetValidationErrors.newPassword = "Mật khẩu không được bỏ trống!";
+      resetValidationErrors.newPassword = "Mật khẩu mới không được bỏ trống!";
     } else if (!passwordRegex.test(newPassword)) {
-      resetValidationErrors.newPassword = "Mật khẩu phải có ít nhất 8 ký tự, ít nhất 1 chữ hoa và 1 số!";
+      resetValidationErrors.newPassword = "Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 số!";
     }
 
     if (!confirmNewPassword) {
-      resetValidationErrors.confirmNewPassword = "Vui lòng xác nhận mật khẩu!";
+      resetValidationErrors.confirmNewPassword = "Vui lòng xác nhận mật khẩu mới!";
     } else if (newPassword !== confirmNewPassword) {
-      resetValidationErrors.confirmNewPassword = "Mật khẩu và xác nhận mật khẩu không khớp!";
+      resetValidationErrors.confirmNewPassword = "Mật khẩu mới và xác nhận không khớp!";
     }
 
     setResetValidationErrors(resetValidationErrors);
     return Object.keys(resetValidationErrors).length === 0;
   };
 
-
   const validateFields = async () => {
     const validationErrors = {};
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$/; // Updated regex
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$/;
   
     if (!username) {
       validationErrors.username = "Tên người dùng không được bỏ trống!";
@@ -116,55 +116,87 @@ const LoginRegister = () => {
     if (!password) {
       validationErrors.password = "Mật khẩu không được bỏ trống!";
     } else if (!passwordRegex.test(password)) {
-      validationErrors.password = "Mật khẩu phải có ít nhất 8 ký tự, ít nhất 1 chữ hoa, 1 chữ số và 1 ký tự đặc biệt!";
+      validationErrors.password = "Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa, 1 số và 1 ký tự đặc biệt!";
     }
   
     if (!confirmPassword) {
       validationErrors.confirmPassword = "Vui lòng xác nhận mật khẩu!";
     } else if (password !== confirmPassword) {
-      validationErrors.confirmPassword = "Mật khẩu và xác nhận mật khẩu không khớp!";
+      validationErrors.confirmPassword = "Mật khẩu và xác nhận không khớp!";
     }
   
     setValidationErrors(validationErrors);
     return Object.keys(validationErrors).length === 0;
   };
   
-
-
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    // Validate the fields (username, email, password, confirmPassword)
     const isValid = await validateFields();
     if (!isValid) return;
 
-    // Call the register function and pass necessary data (username, password, email)
     try {
-        const response = await Auth_Services.register(username, password, email); // Calling the register function
-
-        // Assuming successful registration
-        console.log("Registration successful", response);
-
+        const response = await Auth_Services.register(username, password, email);
+        console.log("Đăng ký thành công", response);
+        toast.success("Đăng ký tài khoản thành công!");
         setShowSuccessModal(true);
-        setCurrentForm("login");  // Switch to the login form after successful registration
+        setCurrentForm("login");
     } catch (error) {
-        console.error("Registration error:", error);
-        setErrorMessage(error.message);  // Display the error message to the user
+        console.error("Lỗi đăng ký:", error);
+        toast.error(error.response?.data || "Đã xảy ra lỗi khi đăng ký");
     }
 };
 
-  
-
-
   const handleForgotPassword = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    
+    if (!email) {
+      toast.error("Vui lòng nhập email!");
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const response = await Auth_Services.ForgotPassword(email);
+      
+      if (response) {
+        toast.success("Vui lòng kiểm tra email để lấy mã xác nhận!");
+        navigate(`/reset-password?email=${encodeURIComponent(email)}`);
+      }
+    } catch (error) {
+      console.error("Lỗi gửi yêu cầu quên mật khẩu:", error);
+      toast.error(error.response?.data || "Đã xảy ra lỗi khi gửi yêu cầu");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-   
+    
+    const isValid = validateResetPassword();
+    if (!isValid) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await Auth_Services.resetPassword(email, resetToken, newPassword);
+      
+      if (response) {
+        toast.success("Đặt lại mật khẩu thành công!");
+        setCurrentForm("login");
+        // Reset các trường
+        setResetToken("");
+        setNewPassword("");
+        setConfirmNewPassword("");
+      }
+    } catch (error) {
+      console.error("Lỗi đặt lại mật khẩu:", error);
+      toast.error(error.response?.data || "Đã xảy ra lỗi khi đặt lại mật khẩu");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   const handleCancel = () => {
     setEmail("");

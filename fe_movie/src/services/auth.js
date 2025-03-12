@@ -49,11 +49,34 @@ const register = async (userName, password, email) => {
     }
 };
 
+const ForgotPassword = async (email) => {
+    try {
+        const response = await axiosInstance.post('/api/account/forgot-password', { email });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
 
+const resetPassword = async (email, token, newPassword, confirmPassword) => {
+    try {
+        const response = await  axiosInstance.post('/api/account/reset-password', {
+            email,
+            token,
+            newPassword,
+            confirmPassword
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 const Auth_Services ={
     loginHandle,
-    register
+    register,
+    ForgotPassword,
+    resetPassword
 }
 export default Auth_Services;

@@ -146,7 +146,8 @@ namespace MovieWebAPI.Controllers
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
             // Tạo liên kết với token để người dùng có thể click vào để reset mật khẩu
-            var resetLink = Url.Action("ResetPassword", "Account", new { token = token, email = request.Email }, Request.Scheme);
+            var resetLink = "http://localhost:3000/reset-password?token=" + token + "&email=" + request.Email;
+
 
             // Gửi email cho người dùng
             await _emailService.SendForgotPasswordEmailAsync(user.Email, user.UserName, resetLink);
@@ -159,22 +160,22 @@ namespace MovieWebAPI.Controllers
 
 
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromQuery] string token, [FromQuery] string email, [FromBody] ResetPasswordRequestDTO request)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDTO request)
         {
-            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
+            if (string.IsNullOrEmpty(request.Token) || string.IsNullOrEmpty(request.Email))
             {
                 return BadRequest("Token or email is missing.");
             }
 
             // Kiểm tra thông tin email và token
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
                 return BadRequest("Invalid request.");
             }
 
             // Gọi ResetPasswordAsync để reset mật khẩu
-            var result = await _userManager.ResetPasswordAsync(user, token, request.NewPassword);
+            var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
 
             if (result.Succeeded)
             {
@@ -185,6 +186,7 @@ namespace MovieWebAPI.Controllers
             var errorMessages = result.Errors.Select(e => e.Description).ToList();
             return BadRequest(new ResponseApiDTO<string>("Error", "Password reset failed.", string.Join(", ", errorMessages)));
         }
+
 
 
     }

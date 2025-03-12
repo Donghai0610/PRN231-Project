@@ -22,6 +22,7 @@ import UpdateBlog from "./Components/AdminPage/component/UpdateBLog.js";
 import MovieList from "./Components/pages/MovieList.js";
 import BlogReview from "./Components/pages/BlogReview.js";
 import BlogDetail from "./Components/pages/BlogDetail.js";
+import ResetPassword from './Components/pages/ResetPassword';
 // PrivateRoute component to handle authentication for all routes
 function PrivateRoute({ element, allowedRoles }) {
   const token = localStorage.getItem("token");
@@ -56,6 +57,7 @@ function App() {
       <Routes>
         {/* Public Route: Login/Register */}
         <Route path="/login" element={<LoginRegister />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Catch-all for undefined routes */}
         <Route path="*" element={<Page404 />} />
@@ -148,3 +150,4 @@ function App() {
 }
 
 export default App;
+
