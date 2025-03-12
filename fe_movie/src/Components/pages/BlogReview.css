@@ -1,0 +1,177 @@
+.blog-review-container {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.search-container {
+    margin-bottom: 30px;
+}
+
+.search-container .MuiOutlinedInput-root {
+    background-color: white;
+    border-radius: 8px;
+}
+
+.search-container .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #e50914;
+}
+
+.search-container .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #e50914;
+}
+
+.search-container .MuiIconButton-root {
+    color: #e50914;
+}
+
+.main-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.description {
+    color: #666;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.blog-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #eaeaea;
+    transition: all 0.3s ease;
+}
+
+.blog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.blog-image {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+}
+
+.blog-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.blog-card:hover .blog-image img {
+    transform: scale(1.05);
+}
+
+.category-tag {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(229, 9, 20, 0.9);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.blog-content {
+    padding: 20px;
+}
+
+.blog-title {
+    color: #1a1a1a;
+    font-size: 20px;
+    font-weight: 600;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 15px;
+    line-height: 1.4;
+    transition: color 0.3s ease;
+}
+
+.blog-title:hover {
+    color: #e50914;
+}
+
+.blog-meta {
+    display: flex;
+    gap: 20px;
+    color: #666;
+    font-size: 14px;
+}
+
+.author {
+    font-weight: 500;
+}
+
+.date {
+    color: #999;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.loading, .error {
+    text-align: center;
+    padding: 40px;
+    font-size: 16px;
+    color: #666;
+}
+
+@media (max-width: 992px) {
+    .blog-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .blog-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .main-title {
+        font-size: 28px;
+    }
+
+    .blog-image {
+        height: 250px;
+    }
+}
+
+@media (max-width: 576px) {
+    .blog-review-container {
+        padding: 20px;
+    }
+
+    .main-title {
+        font-size: 24px;
+    }
+
+    .description {
+        font-size: 14px;
+    }
+
+    .blog-title {
+        font-size: 18px;
+    }
+} 

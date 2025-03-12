@@ -155,13 +155,13 @@ function Header() {
               >
                 Blog
               </Nav.Link>
-              <Nav.Link
+              {/* <Nav.Link
                 as={Link}
                 to={"/price"}
                 className={isActive("/price")}
               >
                 Diễn Viên
-              </Nav.Link>
+              </Nav.Link> */}
               {role === "Admin" && (
                 <Button
                   variant="link"

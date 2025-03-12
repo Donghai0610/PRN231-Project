@@ -21,6 +21,7 @@ import AddBlog from "./Components/AdminPage/component/AddBlog.js";
 import UpdateBlog from "./Components/AdminPage/component/UpdateBLog.js";
 import MovieList from "./Components/pages/MovieList.js";
 import BlogReview from "./Components/pages/BlogReview.js";
+import BlogDetail from "./Components/pages/BlogDetail.js";
 // PrivateRoute component to handle authentication for all routes
 function PrivateRoute({ element, allowedRoles }) {
   const token = localStorage.getItem("token");
@@ -130,7 +131,12 @@ function App() {
           path="/blog-review"
           element={<PrivateRoute element={<BlogReview />} allowedRoles={["Admin", "Customer"]} />}
         />
+        <Route
+          path="/blog-detail/:id"
+          element={<PrivateRoute element={<BlogDetail />} allowedRoles={["Admin", "Customer"]} />}
+        />
        
+
         <Route
           path="/profile/:id"
           element={<PrivateRoute element={<UserProfile />} allowedRoles={["Admin", "Customer"]} />}
