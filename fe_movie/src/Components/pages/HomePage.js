@@ -4,59 +4,121 @@ import "../../CSS/HomePage.css";
 import { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import Movie_Service from "../../services/movie";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 function HomePage() {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      title: "Movie 1",
-      banner: "https://via.placeholder.com/1200x500",
-      poster: "https://via.placeholder.com/200x300",
-      genre_ids: [1, 2],
-      video_url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      duration: 120,
-      release_date: "2024-12-01",
-    },
-    {
-      id: 2,
-      title: "Movie 2",
-      banner: "https://via.placeholder.com/1200x500",
-      poster: "https://via.placeholder.com/200x300",
-      genre_ids: [2, 3],
-      video_url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      duration: 110,
-      release_date: "2024-11-15",
-    },
-  ]);
-  const [movieType, setMovieType] = useState([
-    { id: 1, name: "Action" },
-    { id: 2, name: "Comedy" },
-    { id: 3, name: "Drama" },
-  ]);
-  const [genres, setGenres] = useState([
-    { id: 1, name: "Action" },
-    { id: 2, name: "Comedy" },
-    { id: 3, name: "Drama" },
-  ]);
-  const [selectedMovieType, setSelectedMovieType] = useState(1);
-
+  const [topMovies, setTopMovies] = useState([]);
+  const [hotMovies, setHotMovies] = useState([]);
+  const [upcomingMovies, setUpcomingMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
   const [selectedMovie, setSelectedMovie] = useState(null);
 
-  const handleMovieTypeFilter = (type) => {
-    setSelectedMovieType(type.id);
+  // Cấu hình cho slider
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 4,
+    autoplay: true,
+    autoplaySpeed: 4000,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 3,
+        }
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 2,
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        }
+      }
+    ]
   };
 
-  const filteredData = data.filter((movie) => movie.movie_type == selectedMovieType);
+  // Hàm chuyển đổi URL YouTube thành URL nhúng
+  const getEmbedUrl = (url) => {
+    if (!url) return '';
+    
+    // Xử lý các dạng URL YouTube phổ biến
+    let videoId = '';
+    
+    // Xử lý URL dạng đầy đủ: https://www.youtube.com/watch?v=VIDEO_ID
+    const watchUrlMatch = url.match(/(?:youtube\.com\/watch\?v=)([^&]+)/);
+    if (watchUrlMatch) {
+      videoId = watchUrlMatch[1];
+    }
+    
+    // Xử lý URL dạng rút gọn: https://youtu.be/VIDEO_ID
+    const shortUrlMatch = url.match(/(?:youtu\.be\/)([^?]+)/);
+    if (shortUrlMatch) {
+      videoId = shortUrlMatch[1];
+    }
 
-  const getGenreNames = (genreIds) =>
-    genreIds
-      .map((id) => genres.find((genre) => genre.id == id)?.name)
-      .join(", ");
+    // Nếu tìm thấy video ID, trả về URL nhúng
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+
+    // Nếu không phải URL YouTube hợp lệ, trả về URL gốc
+    return url;
+  };
+
+  useEffect(() => {
+    fetchAllMovies();
+  }, []);
+
+  const formatMovieData = (movies) => {
+    return movies.map(movie => ({
+      id: movie.movieId,
+      title: movie.movieName,
+      image: movie.image,
+      genres: movie.genres.map(genre => genre.name).join(", "),
+      release_date: new Date(movie.releaseDate).toLocaleDateString('vi-VN'),
+      video_url: movie.movieUrl
+    }));
+  };
+
+  const fetchAllMovies = async () => {
+    try {
+      setLoading(true);
+      const [topResponse, hotResponse, upcomingResponse] = await Promise.all([
+        Movie_Service.GetMovieTop4(),
+        Movie_Service.GetMovieHot(),
+        Movie_Service.GetMovieRelsease()
+      ]);
+
+      setTopMovies(formatMovieData(topResponse));
+      setHotMovies(formatMovieData(hotResponse));
+      setUpcomingMovies(formatMovieData(upcomingResponse));
+      setLoading(false);
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách phim:", error);
+      setError("Có lỗi xảy ra khi tải danh sách phim");
+      setLoading(false);
+    }
+  };
 
   const openModal = (movie) => {
-    setVideoUrl(movie.video_url);
+    const embedUrl = getEmbedUrl(movie.video_url);
+    setVideoUrl(embedUrl);
     setSelectedMovie(movie);
     setShowModal(true);
   };
@@ -67,78 +129,84 @@ function HomePage() {
     setSelectedMovie(null);
   };
 
+  const MovieList = ({ movies, title }) => (
+    <div className="movie-section">
+      <h2 className="section-title">{title}</h2>
+      <div className="movie-grid">
+        {movies.map((movie) => (
+          <div className="movie-item" key={movie.id}>
+            <div className="image-container">
+              <img
+                style={{ height: "400px" }}
+                src={movie.image}
+                alt={movie.title}
+              />
+              <div
+                className="overlay-icon"
+                onClick={() => openModal(movie)}
+              >
+                <FaPlay size={40} color="white" />
+              </div>
+            </div>
+            <Link to={`/movie/${movie.id}`}>{movie.title}</Link>
+            <ul>
+              <li>
+                <span>Thể loại:</span> {movie.genres}
+              </li>
+              <li>
+                <span>Ngày xuất chiếu:</span> {movie.release_date}
+              </li>
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const MovieSlider = ({ movies, title }) => (
+    <div className="movie-section">
+      <h2 className="section-title">{title}</h2>
+      <Slider {...sliderSettings}>
+        {movies.map((movie) => (
+          <div key={movie.id} className="slider-movie-item">
+            <div className="image-container">
+              <img src={movie.image} alt={movie.title} />
+              <div className="overlay-icon" onClick={() => openModal(movie)}>
+                <FaPlay size={40} color="white" />
+              </div>
+            </div>
+            <Link to={`/movie/${movie.id}`}>{movie.title}</Link>
+            <ul>
+              <li><span>Thể loại:</span> {movie.genres}</li>
+              <li><span>Ngày chiếu:</span> {movie.release_date}</li>
+            </ul>
+          </div>
+        ))}
+      </Slider>
+    </div>
+  );
+
+  if (loading) return <div>Đang tải...</div>;
+  if (error) return <div>{error}</div>;
+
   return (
     <>
       <Carousel slide interval={5000}>
-        {data.map((movie, index) => (
+        {topMovies.map((movie, index) => (
           <Carousel.Item key={index}>
             <img
               className="d-block w-100"
-              src={movie.banner}
-              alt={`Slide ${index + 1}`}
+              src={movie.image}
+              alt={movie.title}
             />
           </Carousel.Item>
         ))}
       </Carousel>
 
       <div className="home-page-content">
-        <nav className="navi">
-          {movieType.length > 0 ? (
-            movieType.map((type) => (
-              <a
-                key={type.id}
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleMovieTypeFilter(type);
-                }}
-                className={selectedMovieType == type.id ? "actived" : ""}
-              >
-                {type.name}
-              </a>
-            ))
-          ) : (
-            <p>Loading movie types...</p>
-          )}
-        </nav>
-
-        <div className="movie-list">
-          {filteredData.length > 0 ? (
-            filteredData.map((movie) => {
-              return (
-                <div className="movie-item" key={movie.id}>
-                  <div className="image-container">
-                    <img
-                      style={{ height: "400px" }}
-                      src={movie.poster || "https://via.placeholder.com/200x300"}
-                      alt={movie.title}
-                    />
-                    <div
-                      className="overlay-icon"
-                      onClick={() => openModal(movie)}
-                    >
-                      <FaPlay size={40} color="white" />
-                    </div>
-                  </div>
-                  <Link to={`/movie/${movie.id}`}> {movie.title}</Link>
-                  <ul>
-                    <li>
-                      <span>Thể loại:</span> {getGenreNames(movie.genre_ids)}
-                    </li>
-                    <li>
-                      <span>Thời lượng:</span> {movie.duration || "N/A"} phút
-                    </li>
-                    <li>
-                      <span>Ngày sản chiếu:</span> {movie.release_date || "N/A"}
-                    </li>
-                  </ul>
-                </div>
-              );
-            })
-          ) : (
-            <p>Loading movies...</p>
-          )}
-        </div>
+        <MovieList movies={topMovies} title="Phim Đề Xuất" />
+        <MovieList movies={hotMovies} title="Phim Bộ Đang Chiếu" />
+        <MovieSlider movies={upcomingMovies} title="Phim Sắp Chiếu" />
       </div>
 
       <Modal show={showModal} onHide={closeModal} centered size="lg">
@@ -146,15 +214,19 @@ function HomePage() {
           <Modal.Title>Trailer: {selectedMovie?.title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <iframe
-            width="100%"
-            height="415"
-            src={videoUrl}
-            title="Movie Trailer"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
+          {videoUrl ? (
+            <iframe
+              width="100%"
+              height="415"
+              src={videoUrl}
+              title="Movie Trailer"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          ) : (
+            <div>Không có trailer cho phim này</div>
+          )}
         </Modal.Body>
       </Modal>
     </>

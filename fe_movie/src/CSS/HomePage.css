@@ -1,3 +1,10 @@
+/* Thêm style cho body và background chung */
+body {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #fff;
+  min-height: 100vh;
+}
+
 .carousel .carousel-inner {
   display: flex;
 }
@@ -34,11 +41,13 @@
 .carousel-item img {
   display: none;
 }
+
 .home-page-content {
-  color: #333;
-  margin: 3rem auto;
+  padding: 20px;
   max-width: 1200px;
+  margin: 0 auto;
 }
+
 .navi {
   display: flex;
   justify-content: center;
@@ -62,32 +71,51 @@
   color: #007bff;
 }
 
-.movie-list {
+.movie-section {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e50914;
+  color: #fff;
+}
+
+.movie-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
-  justify-items: start;
+  margin-bottom: 30px;
 }
 
 .movie-item {
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  text-align: left;
-  padding: 15px;
-  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.movie-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .image-container {
   position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
 }
 
 .image-container img {
-  display: block;
   width: 100%;
-  border-radius: 10px;
-  margin-bottom: 10px;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
 .overlay-icon {
@@ -95,6 +123,14 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.7);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -103,34 +139,183 @@
   opacity: 1;
 }
 
+.image-container:hover img {
+  transform: scale(1.05);
+}
+
 .movie-item a {
-  text-decoration: none;
+  color: #fff;
   font-weight: bold;
+  text-decoration: none;
+  font-size: 16px;
+  text-align: center;
+  padding: 10px;
+  display: block;
+  transition: color 0.3s ease;
 }
 
 .movie-item a:hover {
-  text-decoration: underline;
+  color: #e50914;
 }
 
-.movie-item h5 {
-  font-size: 18px;
-  color: #333;
-  margin: 10px 0;
-}
 .movie-item ul {
   list-style: none;
-  padding: 0;
-  margin: 10px 0 0 0;
+  padding: 0 10px 10px;
+  margin: 0;
+  font-size: 14px;
 }
 
 .movie-item ul li {
+  color: #ccc;
   margin-bottom: 5px;
 }
 
 .movie-item ul li span {
+  color: #fff;
   font-weight: bold;
 }
 
-.carousel-item img {
-  object-fit: contain;
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .movie-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .movie-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .movie-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .image-container {
+    height: 400px;
+  }
+}
+
+/* Thêm CSS cho slider */
+.slider-movie-item {
+  padding: 10px;
+}
+
+.slider-movie-item .image-container {
+  height: 300px;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.slider-movie-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.slider-movie-item .image-container:hover img {
+  transform: scale(1.05);
+}
+
+.slider-movie-item .overlay-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.7);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.slider-movie-item .image-container:hover .overlay-icon {
+  opacity: 1;
+}
+
+.slider-movie-item a {
+  color: #fff;
+  transition: color 0.3s ease;
+}
+
+.slider-movie-item a:hover {
+  color: #e50914;
+}
+
+.slider-movie-item ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+}
+
+.slider-movie-item ul li {
+  color: #ccc;
+  margin-bottom: 5px;
+}
+
+.slider-movie-item ul li span {
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Tùy chỉnh nút điều hướng của slider */
+.slick-prev,
+.slick-next {
+  background: rgba(229, 9, 20, 0.7) !important;
+}
+
+.slick-prev:hover,
+.slick-next:hover {
+  background: rgba(229, 9, 20, 0.9) !important;
+}
+
+.slick-dots {
+  bottom: -40px;
+}
+
+.slick-dots li button:before {
+  color: #fff;
+}
+
+.slick-dots li.slick-active button:before {
+  color: #e50914;
+}
+
+/* Responsive cho slider */
+@media (max-width: 1200px) {
+  .slick-prev {
+    left: -30px;
+  }
+  .slick-next {
+    right: -30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .slick-prev {
+    left: -20px;
+  }
+  .slick-next {
+    right: -20px;
+  }
+  .slider-movie-item .image-container {
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .slider-movie-item .image-container {
+    height: 200px;
+  }
 }

@@ -211,11 +211,72 @@ const CreateMovie = async (movie) => {
   
 const GetMovieTop4 = async () => {
   try {
-    const response = await axiosInstance.get('/api/Movies?top=4&skip=6');
+    const response = await axiosInstance.get('/api/Movies?top=4&skip=6&$filter=isActive eq true');
     return response.data;
   } catch (error) {
     console.error("Error fetching top 4 movies:", error);
     throw error;
+  }
+};
+
+const GetMovieHot = async () => {
+  try {
+    const response = await axiosInstance.get('/api/Movies?top=8&skip=1&$filter=isActive eq true');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching top 4 movies:", error);
+    throw error;
+  }
+}
+const GetMovieRelsease = async () => {
+  try {
+    const response = await axiosInstance.get('/api/Movies?top=8&skip=0&$filter=isActive eq false');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching top 4 movies:", error);
+    throw error;
+  }
+}
+
+
+const GetAllMoviesForUser = async (genreName = null, actorName = null, movieName = null, skip = 0, top = 5) => {
+  try {
+      let filter = '';
+      
+      if (genreName) {
+        if (filter) filter += ' and '; 
+          filter += `genres/any(g: g/name eq '${genreName}')`;
+      }
+
+      if (actorName) {
+          if (filter) filter += ' and '; 
+          filter += `actors/any(a: contains(a/fullname, '${actorName}'))`;
+      }
+
+      if (movieName) {
+        if (filter) filter += ' and '; 
+          filter += `contains(movieName, '${movieName}')`;
+      }
+
+      let url = '/api/Movies';
+
+      if (filter) {
+          url += `?$filter=${filter}`;
+      }
+
+      if (!filter) {
+          url += `?$skip=${skip}&$top=${top}`;
+      } else {
+          // Thêm phân trang khi có filter
+          url += `&$skip=${skip}&$top=${top} &$filter=isActive eq true`;
+      }
+
+      const response = await axiosInstance.get(url);
+
+      return response;  
+  } catch (error) {
+      console.error('Lỗi khi lấy dữ liệu phim:', error);
+      return [];
   }
 };
 
@@ -226,6 +287,9 @@ const Movie_Service = {
     UpdateMovie,
     DeleteMovie,
     ActiveMovie,
-    GetMovieTop4
+    GetMovieTop4,
+    GetMovieHot,
+    GetMovieRelsease,
+    GetAllMoviesForUser,
 }
 export default Movie_Service;
