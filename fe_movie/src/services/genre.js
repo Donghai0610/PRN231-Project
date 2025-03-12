@@ -52,12 +52,23 @@ const DeleteGenre = async (id) => {
     }
 };
 
+const GetAllGenreUser = async () => {
+    try {
+        const response = await axiosInstance.get("/odata/Genre");
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching genres:", error);
+        throw error;
+    }
+};
+
 const Genre_Services = {
     GetAllGenre,
     GetGenreById,
     CreateGenre,
     UpdateGenre,
-    DeleteGenre
+    DeleteGenre,
+    GetAllGenreUser
 };
 
 export default Genre_Services;

@@ -1,0 +1,347 @@
+.movie-list-container {
+    padding: 20px;
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+
+.search-and-view {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-form {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 10px;
+}
+
+.filters-bar {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.filter-item {
+    margin-bottom: 10px;
+}
+
+.filter-item label {
+    color: #fff;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.filter-item select {
+    width: 100%;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border-radius: 4px;
+}
+
+.filter-item select option {
+    background: #16213e;
+    color: #fff;
+}
+
+.movies-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.movie-card {
+    background: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.movie-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.movie-image {
+    position: relative;
+    width: 100%;
+    padding-top: 150%;
+}
+
+.movie-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.movie-info {
+    padding: 10px;
+    background: #fff;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.movie-info h3 {
+    color: #333;
+    font-size: 14px;
+    margin: 0 0 8px;
+    line-height: 1.3;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.movie-meta {
+    display: flex;
+    gap: 10px;
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.genres {
+    color: #666;
+    font-size: 12px;
+    margin: 0 0 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.movie-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.btn-watch-now, .btn-details {
+    flex: 1;
+    padding: 6px;
+    font-size: 12px;
+}
+
+.btn-watch-now {
+    background: #e50914;
+    color: #fff;
+    border: none;
+    text-decoration: none;
+}
+
+.btn-details {
+    background: #fff;
+    color: #333;
+    border: 1px solid #dee2e6;
+    text-decoration: none;
+}
+
+.btn-watch-now:hover {
+    background: #f6121d;
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-details:hover {
+    background: #f8f9fa;
+    color: #333;
+    text-decoration: none;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.pagination .page-link {
+    background: #fff;
+    border-color: #dee2e6;
+    color: #333;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #e50914;
+    border-color: #e50914;
+    color: #fff;
+}
+
+.loading, .error {
+    color: #333;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 1400px) {
+    .movies-container {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (max-width: 1200px) {
+    .movies-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .movies-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .movies-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .movies-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+}
+
+.filters-sidebar {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-box {
+    margin-bottom: 20px;
+}
+
+.search-box .form-control {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    color: #333;
+}
+
+.search-box .form-control:focus {
+    border-color: #e50914;
+    box-shadow: 0 0 0 0.2rem rgba(229, 9, 20, 0.25);
+}
+
+.search-box .btn-primary {
+    background: #e50914;
+    border-color: #e50914;
+}
+
+.filter-section {
+    margin-bottom: 25px;
+}
+
+.filter-section h4 {
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.filter-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.filter-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.filter-list::-webkit-scrollbar-track {
+    background: #f8f9fa;
+}
+
+.filter-list::-webkit-scrollbar-thumb {
+    background: #dee2e6;
+    border-radius: 3px;
+}
+
+.form-check {
+    margin-bottom: 10px;
+}
+
+.form-check-label {
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: #e50914;
+    border-color: #e50914;
+}
+
+.no-movies {
+    color: #666;
+    text-align: center;
+    padding: 20px;
+    grid-column: 1 / -1;
+}
+
+.search-container {
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.search-container form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 0;
+    height: 32px !important;
+    font-size: 13px !important;
+}
+
+.search-container .btn-primary {
+    height: 32px;
+    padding: 0 15px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    background-color: #e50914;
+    border-color: #e50914;
+    min-width: 100px;
+}
+
+.search-container .btn-primary:hover {
+    background-color: #cc0812;
+    border-color: #cc0812;
+}
+
+.search-container .form-control:focus {
+    border-color: #e50914;
+    box-shadow: 0 0 0 0.2rem rgba(229, 9, 20, 0.25);
+} 

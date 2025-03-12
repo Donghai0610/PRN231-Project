@@ -179,20 +179,18 @@ const CreateMovie = async (movie) => {
   
   const DeleteMovie = async (id) => {
     try {
-      // Gửi yêu cầu DELETE đến API để xóa phim với ID tương ứng
       const response = await axiosInstance.delete(`/api/Movies/${id}`);
   
-      // Kiểm tra phản hồi từ API, ví dụ có thể trả về thông tin phim vừa xóa
       if (response.status === 200) {
         console.log("Phim đã được xóa thành công!");
-        return response.data; // Trả về dữ liệu nếu cần
+        return response.data; 
       } else {
         console.error("Xóa phim không thành công:", response);
         throw new Error("Không thể xóa phim");
       }
     } catch (error) {
       console.error("Lỗi khi xóa phim:", error);
-      throw error; // Ném lỗi để có thể xử lý ở nơi gọi hàm
+          throw error; 
     }
   };
   
@@ -202,10 +200,10 @@ const CreateMovie = async (movie) => {
       const response = await axiosInstance.put(`/api/Movies/${id}/activate`,
         true,
       );
-      return response.data;  // Trả về kết quả nếu cập nhật thành công
+      return response.data;  
     } catch (error) {
       console.error("Error updating movie status:", error);
-      throw error; // Ném lỗi để có thể xử lý tại nơi gọi hàm
+      throw error; 
     }
   };
   
@@ -239,45 +237,50 @@ const GetMovieRelsease = async () => {
 }
 
 
-const GetAllMoviesForUser = async (genreName = null, actorName = null, movieName = null, skip = 0, top = 5) => {
-  try {
-      let filter = '';
-      
-      if (genreName) {
-        if (filter) filter += ' and '; 
-          filter += `genres/any(g: g/name eq '${genreName}')`;
-      }
+const GetAllMoviesForUser = async (genreName = null, actorName = null, movieName = null, releaseYear = null, skip = 0, top = 5) => {
+    try {
+        let filters = [];
+        
+        // Thêm điều kiện isActive
+        filters.push('isActive eq true');
 
-      if (actorName) {
-          if (filter) filter += ' and '; 
-          filter += `actors/any(a: contains(a/fullname, '${actorName}'))`;
-      }
+        // Thêm filter cho genre nếu có
+        if (genreName) {
+            filters.push(`genres/any(g: g/name eq '${genreName}')`);
+        }
 
-      if (movieName) {
-        if (filter) filter += ' and '; 
-          filter += `contains(movieName, '${movieName}')`;
-      }
+        // Thêm filter cho actor nếu có
+        if (actorName) {
+            filters.push(`actors/any(a: contains(a/fullname, '${actorName}'))`);
+        }
 
-      let url = '/api/Movies';
+        // Thêm filter cho tên phim nếu có
+        if (movieName) {
+            filters.push(`contains(movieName, '${movieName}')`);
+        }
 
-      if (filter) {
-          url += `?$filter=${filter}`;
-      }
+        // Thêm filter cho năm phát hành nếu có
+        if (releaseYear) {
+            filters.push(`year(releaseDate) eq ${releaseYear}`);
+        }
 
-      if (!filter) {
-          url += `?$skip=${skip}&$top=${top}`;
-      } else {
-          // Thêm phân trang khi có filter
-          url += `&$skip=${skip}&$top=${top} &$filter=isActive eq true`;
-      }
+        // Tạo URL với các filter
+        let url = '/api/Movies?';
+        
+        // Thêm điều kiện filter nếu có
+        if (filters.length > 0) {
+            url += `$filter=${filters.join(' and ')}`;
+        }
 
-      const response = await axiosInstance.get(url);
+        // Thêm phân trang
+        url += `${filters.length > 0 ? '&' : ''}$skip=${skip}&$top=${top}`;
 
-      return response;  
-  } catch (error) {
-      console.error('Lỗi khi lấy dữ liệu phim:', error);
-      return [];
-  }
+        const response = await axiosInstance.get(url);
+        return response;
+    } catch (error) {
+        console.error('Lỗi khi lấy dữ liệu phim:', error);
+        return { data: [] };
+    }
 };
 
 const Movie_Service = {

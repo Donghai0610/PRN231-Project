@@ -76,12 +76,24 @@ const DeleteActor = async (actorId) => {
         throw error;
     }
 };
+
+const GetAllActorsUser = async () => {
+    try {
+        const response = await axiosInstance.get("/api/Actor");
+        return response.data; // Return response.data directly
+    } catch (error) {
+        console.error("Error fetching actors:", error);
+        throw error;
+    }
+};
+
 const Actor_Service = {
     GetAllActors,
     GetActorById,
     AddActor,
     UpdateActor,
-    DeleteActor
+    DeleteActor,
+    GetAllActorsUser
 
 };
 
