@@ -1,253 +1,164 @@
 import React, { useEffect, useState } from "react";
-import "../../CSS/MovieDetail.css";
-import { useParams, useNavigate } from "react-router-dom";
-import { Modal, Button, Table } from "react-bootstrap";
-import { IoTicketOutline } from "react-icons/io5";
+import { useParams } from "react-router-dom";
+import { FaFacebookF, FaPlay, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { Modal } from "react-bootstrap";
+import Movie_Service from "../../services/movie";
+import "./MovieDetail.css";
+
 const MovieDetail = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
-  const [genres, setGenres] = useState([]);
-  const [languages, setLanguages] = useState([]);
-  const [cinema, setCinema] = useState([]);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedShowtime, setSelectedShowtime] = useState(null);
-  const navigate = useNavigate();
-  const handleBookTicket = () => {
-    if (selectedShowtime) {
-      navigate(`/booking/${movie.id}`, {
-        state: { showtimeId: selectedShowtime.id },
-      });
-    }
-  };
-  const handleShowtimeClick = (showtime) => {
-    setSelectedShowtime(showtime);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    const fetchMovieDetail = async () => {
+      try {
+        const response = await Movie_Service.GetMovieById(id);
+        setMovie(response);
+        console.log("Movie detail:", response);
+      } catch (error) {
+        console.error("Error fetching movie details:", error);
+      }
+    };
+    fetchMovieDetail();
+  }, [id]);
+
+  if (!movie) {
+    return <div className="movie-detail-container">Loading...</div>;
+  }
+
+  const releaseYear = new Date(movie.releaseDate).getFullYear();
+
+  const handleWatchMovie = () => {
+    setShowModal(true);
   };
 
   const handleCloseModal = () => {
-    setSelectedShowtime(null);
+    setShowModal(false);
   };
 
-  useEffect(() => {
-    fetch(`http://localhost:3001/movies/${id}`)
-      .then((response) => response.json())
-      .then((data) => setMovie(data))
-      .catch((error) => console.error("Error fetching movie:", error));
-
-    fetch("http://localhost:3001/genres")
-      .then((response) => response.json())
-      .then((data) => setGenres(data))
-      .catch((error) => console.error("Error fetching genres:", error));
-
-    fetch("http://localhost:3001/languages")
-      .then((response) => response.json())
-      .then((data) => setLanguages(data))
-      .catch((error) => console.error("Error fetching languages:", error));
-
-    fetch(`http://localhost:3001/cinema/1`)
-      .then((response) => response.json())
-      .then((data) => setCinema(data))
-      .catch((error) => console.error("Error fetching showtimes:", error));
-  }, [id]);
-
-  useEffect(() => {
-    if (movie?.showtimes?.length > 0) {
-      const earliestDate = movie.showtimes
-        .map((showtime) => showtime.date)
-        .sort()[0];
-      setSelectedDate(earliestDate);
-    }
-  }, [movie]);
-
-  if (!movie) {
-    return <p>Loading movie details...</p>;
-  }
-
-  const getGenreNames = (genreIds) =>
-    genreIds
-      .map((id) => genres.find((genre) => genre.id == id)?.name)
-      .join(", ");
-
-  const getLanguageName = (languageId) =>
-    languages.find((language) => language.id == languageId)?.name;
-
-  const handleDateClick = (date) => {
-    setSelectedDate(date);
+  // Extract video ID from YouTube URL
+  const getYouTubeVideoId = (url) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("vi-VN", {
-      weekday: "long",
-      day: "2-digit",
-      month: "2-digit",
-    });
-  };
-
-  const formatTime = (timeString) => {
-    const [hours, minutes, seconds] = timeString.split(":").map(Number);
-    const time = new Date();
-    time.setHours(hours, minutes, seconds, 0);
-    return time.toLocaleTimeString("vi-VN", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-  };
-
-  const filteredShowtimes = movie.showtimes.filter(
-    (showtime) => showtime.date == selectedDate
-  );
+  const videoId = movie.movieUrl ? getYouTubeVideoId(movie.movieUrl) : null;
 
   return (
-    <div className="movie-detail">
-      <main className="content">
-        <div className="breadcrumb" style={{ fontSize: "1.5rem" }}>
-          <a href="#">Home</a> &gt;{" "}
-          <span className="highlight">{movie.title}</span>
+    <div className="movie-detail-container">
+      <div className="movie-detail-header">
+        <div className="movie-poster">
+          <img src={movie.image} alt={movie.movieName} />
+          <button className="watch-movie-btn" onClick={handleWatchMovie}>
+            <FaPlay /> Xem Phim
+          </button>
         </div>
-
-        <div className="movie-info">
-          <div className="posters">
-            <img
-              src={movie.poster}
-              alt={`${movie.title} Poster`}
-              className="poster-image"
-            />
+        <div className="movie-info-section">
+          <h1>{movie.movieName}</h1>
+          <h2>Hiệp sĩ mù: Tái sinh ({releaseYear})</h2>
+          
+          <div className="rating-section">
+            <div className="tv-rating">TV-MA</div>
+            <div className="imdb-rating">
+              <span className="imdb-label">IMDb</span>
+              <span className="rating-value">9.3</span>
+            </div>
+            <div className="social-buttons">
+              <button className="facebook-share">
+                <FaFacebookF /> Chia sẻ
+              </button>
+              <button className="add-list">+ Thêm vào tập</button>
+            </div>
           </div>
 
-          <div className="details">
-            <h1>{movie.title}</h1>
-            <p>{movie.description}</p>
-            <ul className="list-unstyled row">
-              <li className="col-md-3 col-sm-5">
-                <strong>ĐẠO DIỄN:</strong>
-              </li>
-              <li className="col-md-9 col-sm-7">{movie.director}</li>
-
-              <li className="col-md-3 col-sm-5">
-                <strong>DIỄN VIÊN:</strong>
-              </li>
-              <li className="col-md-9 col-sm-7">{movie.actor}</li>
-
-              <li className="col-md-3 col-sm-5">
-                <strong>THỂ LOẠI:</strong>
-              </li>
-              <li className="col-md-9 col-sm-7">
-                {getGenreNames(movie.genre_ids)}
-              </li>
-
-              <li className="col-md-3 col-sm-5">
-                <strong>THỜI LƯỢNG:</strong>
-              </li>
-              <li className="col-md-9 col-sm-7">{movie.duration} phút</li>
-
-              <li className="col-md-3 col-sm-5">
-                <strong>NGÔN NGỮ:</strong>
-              </li>
-              <li className="col-md-9 col-sm-7">
-                {getLanguageName(movie.language_id)}
-              </li>
-
-              <li className="col-md-3 col-sm-5">
-                <strong>NGÀY KHỞI CHIẾU:</strong>
-              </li>
-              <li className="col-md-9 col-sm-7">{movie.release_date}</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="container">
-          <div className="date-selector">
-            {movie.showtimes
-              .map((s) => s.date)
-              .filter((value, index, self) => self.indexOf(value) === index)
-              .sort((a, b) => new Date(a) - new Date(b))
-              .map((date) => (
-                <div
-                  key={date}
-                  className={`date-item ${
-                    selectedDate === date ? "active" : ""
-                  }`}
-                  onClick={() => handleDateClick(date)}
-                >
-                  {formatDate(date)}
-                </div>
-              ))}
+          <div className="movie-creators">
+            <div className="creator-section">
+              <h3>SÁNG LẬP</h3>
+              <p>Matt Corman, Dario Scardapane, Chris Ord</p>
+            </div>
+            <div className="creator-section">
+              <h3>QUỐC GIA</h3>
+              <p>Mỹ</p>
+            </div>
+            <div className="creator-section">
+              <h3>KHỞI CHIẾU</h3>
+              <p>{new Date(movie.releaseDate).toLocaleDateString('vi-VN')}</p>
+            </div>
           </div>
 
-          <div className="schedule">
-            <h2>{getLanguageName(movie.language_id)}</h2>
-            {filteredShowtimes.length > 0 ? (
-              <div className="time-slot">
-                {filteredShowtimes.map((showtime) => (
-                  <div
-                    key={showtime.id}
-                    className="time-box"
-                    onClick={() => handleShowtimeClick(showtime)}
-                  >
-                    <p>{formatTime(showtime.start_time)}</p>
-                    <span>Giá vé: {showtime.price.toLocaleString()} VNĐ</span>
+          <p className="movie-description">{movie.description}</p>
+
+          <div className="cast-section">
+            <h2>DIỄN VIÊN</h2>
+            <div className="cast-list-container">
+              <button className="cast-nav-btn prev">
+                <FaChevronLeft />
+              </button>
+              <div className="cast-list">
+                {movie.actors.map((actor) => (
+                  <div key={actor.actorId} className="cast-member">
+                    <div className="cast-image">
+                      <img src={actor.image} alt={actor.fullName} />
+                    </div>
+                    <div className="cast-info">
+                      <h4>{actor.fullName}</h4>
+                      <p>{actor.character || actor.fullName}</p>
+                    </div>
                   </div>
                 ))}
               </div>
-            ) : (
-              <p>Không có suất chiếu nào cho ngày này.</p>
-            )}
-          </div>
-          <div className="trainer">
-            <h1 class="title">TRAILER</h1>
-            <div class="video-container">
-              <iframe
-                src={movie.video_url}
-                frameborder="0"
-                allowfullscreen
-              ></iframe>
+              <button className="cast-nav-btn next">
+                <FaChevronRight />
+              </button>
             </div>
           </div>
-          <Modal
-            show={selectedShowtime}
-            onHide={handleCloseModal}
-            centered
-            className="custom-modal"
-            size="lg"
-          >
-            <Modal.Header closeButton>
-              <Modal.Title>Bạn đang đặt vé xem phim</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              {selectedShowtime && (
-                <>
-                  <h5>{movie.title}</h5>
-                  <Table striped bordered hover>
-                    <thead>
-                      <tr>
-                        <th>Rạp chiếu</th>
-                        <th>Ngày chiếu</th>
-                        <th>Giờ chiếu</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>{cinema.name}</td>
-                        <td>{selectedShowtime.date}</td>
-                        <td>{formatTime(selectedShowtime.start_time)}</td>
-                      </tr>
-                    </tbody>
-                  </Table>
-                </>
-              )}
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="primary" onClick={handleBookTicket}>
-                <IoTicketOutline
-                  style={{ marginRight: "8px", fontSize: "1.5rem" }}
-                />
-                Đặt vé
-              </Button>
-            </Modal.Footer>
-          </Modal>
         </div>
-      </main>
+      </div>
+
+      <div className="trailer-section">
+        <h2>TRAILER</h2>
+        <div className="trailer-grid">
+          <div className="trailer-item">
+            <img src={movie.image} alt="Trailer 1" />
+          </div>
+          <div className="trailer-item">
+            <img src={movie.image} alt="Trailer 2" />
+          </div>
+          <div className="trailer-item">
+            <img src={movie.image} alt="Trailer 3" />
+          </div>
+          <div className="trailer-item">
+            <img src={movie.image} alt="Trailer 4" />
+          </div>
+        </div>
+      </div>
+
+      <div className="season-section">
+        <h2>SEASON</h2>
+        {/* Season content will be added later */}
+      </div>
+
+      <Modal show={showModal} onHide={handleCloseModal} size="lg" centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{movie.movieName}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="video-container">
+            {videoId && (
+              <iframe
+                width="100%"
+                height="480"
+                src={`https://www.youtube.com/embed/${videoId}`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            )}
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };
