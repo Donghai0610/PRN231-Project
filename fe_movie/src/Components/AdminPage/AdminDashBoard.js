@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Chart as ChartJS,
@@ -21,7 +21,8 @@ import {
 } from "@mui/material";
 
 // Sử dụng react-chartjs-2
-import { Pie, Bar } from "react-chartjs-2";  {/* Đưa lên đầu */}
+import { Pie, Bar } from "react-chartjs-2";import Stats_Service from "../../services/stats";
+  {/* Đưa lên đầu */}
 
 // Đăng ký các thành phần cho chart.js
 ChartJS.register(
@@ -37,10 +38,51 @@ ChartJS.register(
 
 const AdminDashboard = () => {
   // Dữ liệu thống kê mock
-  const totalMovies = 123;
-  const totalUsers = 456;
-  const totalGenres = 10;
-  const totalActors = 999;
+
+
+const [totalMovies, setTotalMovies] = useState(0);
+const [totalUsers, setTotalUsers] = useState(0);
+const [totalGenres, setTotalGenres] = useState(0);
+const [totalActors, setTotalActors] = useState(0);
+
+useEffect(() => {
+  getTotalMoviesStats();
+  getTotalUsersStats();
+  getTotalGenresStats();
+  getTotalActorsStats();
+}, []);
+
+const getTotalMoviesStats = async () => {
+  const response = await Stats_Service.getTotalMoviesStats();
+  const totalMovies = response.length;
+  setTotalMovies(totalMovies);
+}
+
+const getTotalUsersStats = async () => {
+  const response = await Stats_Service.getTotalUsersStats();
+  const totalUsers = response.length;
+  setTotalUsers(totalUsers);
+}
+
+const getTotalGenresStats = async () => {
+  const response = await Stats_Service.getTotalGenresStats();
+  const totalGenres = response.length;
+  setTotalGenres(totalGenres);
+}
+
+const getTotalActorsStats = async () => {
+  const response = await Stats_Service.getTotalActorsStats();
+  const totalActors = response.data.length;
+  setTotalActors(totalActors);
+}
+
+
+
+
+
+
+
+
 
   // Dữ liệu Pie Chart: tỉ lệ phim theo thể loại
   // Ở đây là ví dụ 4 thể loại
