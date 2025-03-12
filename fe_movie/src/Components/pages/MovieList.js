@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Form, InputGroup, Button, Pagination } from 'react-bootstrap';
+import { Container, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
 import Movie_Service from '../../services/movie';
 import Genre_Services from '../../services/genre';
 import Actor_Service from '../../services/actor';
 import { Link } from 'react-router-dom';
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 import './MovieList.css';
 import axiosInstance from '../../services/axios';
 
@@ -24,7 +26,7 @@ const MovieList = () => {
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
-    const itemsPerPage = 8;
+    const itemsPerPage = 10;
 
     useEffect(() => {
         fetchInitialData();
@@ -114,19 +116,32 @@ const MovieList = () => {
     };
 
     const renderPagination = () => {
-        let items = [];
-        for (let number = 1; number <= totalPages; number++) {
-            items.push(
-                <Pagination.Item
-                    key={number}
-                    active={number === currentPage}
-                    onClick={() => handlePageChange(number)}
-                >
-                    {number}
-                </Pagination.Item>
-            );
-        }
-        return <Pagination>{items}</Pagination>;
+        return (
+            <Stack spacing={2} alignItems="center">
+                <Pagination 
+                    count={totalPages}
+                    page={currentPage}
+                    onChange={(event, value) => handlePageChange(value)}
+                    color="primary"
+                    size="large"
+                    sx={{
+                        '& .MuiPaginationItem-root': {
+                            color: '#666',
+                            '&.Mui-selected': {
+                                backgroundColor: '#e50914',
+                                color: '#fff',
+                                '&:hover': {
+                                    backgroundColor: '#cc0812',
+                                },
+                            },
+                            '&:hover': {
+                                backgroundColor: 'rgba(229, 9, 20, 0.1)',
+                            },
+                        },
+                    }}
+                />
+            </Stack>
+        );
     };
 
     const MovieCard = ({ movie }) => (
@@ -144,9 +159,6 @@ const MovieList = () => {
                 <div className="movie-buttons">
                     <Link to={`/movie/${movie.movieId}`} className="btn-watch-now">
                         Xem ngay
-                    </Link>
-                    <Link to={`/movie/${movie.movieId}`} className="btn-details">
-                        Chi tiết
                     </Link>
                 </div>
             </div>
