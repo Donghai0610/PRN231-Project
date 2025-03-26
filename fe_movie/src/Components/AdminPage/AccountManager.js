@@ -15,7 +15,7 @@ function AccountManager() {
   const fetchUsers = async () => {
     try {
       const response = await User_Service.getUsers();
-      setUsers(response.data);
+      setUsers(response);
       setLoading(false);
     } catch (err) {
       setError("Không thể tải danh sách người dùng");
@@ -58,8 +58,8 @@ function AccountManager() {
           {users.map((user) => (
             <tr key={user.id}>
               <td>{user.id}</td>
+              <td>{user.userName}</td>
               <td>{user.email}</td>
-              <td>{user.fullName}</td>
               <td>
                 <span className={`badge ${user.isActive ? 'bg-success' : 'bg-danger'}`}>
                   {user.isActive ? 'Đang hoạt động' : 'Đã khóa'}

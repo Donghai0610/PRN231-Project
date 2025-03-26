@@ -1,7 +1,7 @@
-
+import axiosInstance from "./axios";
 
 const getUsers = async () => {
-  const response = await axiosInstance.get('/api/User');
+  const response = await axiosInstance  .get('/api/User');
   return response.data;
 }
 

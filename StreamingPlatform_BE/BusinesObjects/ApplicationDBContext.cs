@@ -29,6 +29,8 @@ namespace BusinesObjects
         public DbSet<MovieGenre> MovieGenres { get; set; }  // Đảm bảo DbSet cho MovieGenre
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Blog> Blogs { get; set; }
+        public DbSet<IdentityRole> Roles { get; set; }
+        public DbSet<IdentityUserRole<string>> UserRoles { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

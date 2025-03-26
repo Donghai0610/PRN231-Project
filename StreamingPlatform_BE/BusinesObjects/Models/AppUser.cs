@@ -26,5 +26,6 @@ namespace BusinesObjects.Models
         public ICollection<Blog> Blogs { get; set; }
 
 
+
     }
 }

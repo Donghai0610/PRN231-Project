@@ -25,9 +25,8 @@ builder.Services.AddSingleton(mapper);
 var modelBuilder = new ODataConventionModelBuilder();
 modelBuilder.EntitySet<Movie>("Movies");
 modelBuilder.EntitySet<Blog>("Blog");
-modelBuilder.EntitySet<AppUser>("User");
+modelBuilder.EntitySet<AppUser>("AppUser");
 modelBuilder.EntitySet<Genre>("Genre");
-
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -56,14 +55,14 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 .AddDefaultTokenProviders();
 
 builder.Services.AddControllers()
-    .AddOData(options =>
+    .AddOData(options =>                                                                
         options.Select()
                .Filter()
                .OrderBy()
-               .Count() // Bật tính năng COUNT
+               .Count() 
                .Expand()
                .SetMaxTop(100)
-               .AddRouteComponents("odata", modelBuilder.GetEdmModel()));
+               .AddRouteComponents("api", modelBuilder.GetEdmModel()));
 
 builder.Services.AddAuthentication(options =>
 {

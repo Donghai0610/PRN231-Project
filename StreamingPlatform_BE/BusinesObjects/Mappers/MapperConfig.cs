@@ -9,6 +9,7 @@ using BusinesObjects.Dtos.response.Auth;
 using BusinesObjects.Dtos.response.Blog;
 using BusinesObjects.Dtos.response.Genre;
 using BusinesObjects.Dtos.response.Movie;
+using BusinesObjects.Dtos.response.User;
 using BusinesObjects.Models;
 using System;
 using System.Collections.Generic;
@@ -72,7 +73,9 @@ namespace BusinesObjects.Mappers
             CreateMap<Blog, BlogResponseDTO>().ReverseMap();
 
             CreateMap<UpdateBlogRequestDTO, Blog>()
-               .ForMember(dest => dest.Content, opt => opt.Ignore()); 
+               .ForMember(dest => dest.Content, opt => opt.Ignore());
+
+            CreateMap<AppUser, UserWithRolesDTO>().PreserveReferences().ReverseMap();
 
         }
 
