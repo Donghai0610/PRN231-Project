@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
-import { FaSearch } from 'react-icons/fa';
+import { Container, Row, Col, Form, InputGroup, Button, Badge } from 'react-bootstrap';
+import { FaSearch, FaFilter, FaTimes, FaPlay, FaClock, FaStar } from 'react-icons/fa';
 import Movie_Service from '../../services/movie';
 import Genre_Services from '../../services/genre';
 import Actor_Service from '../../services/actor';
@@ -22,11 +22,12 @@ const MovieList = () => {
     const [selectedActor, setSelectedActor] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [releaseYear, setReleaseYear] = useState('');
+    const [showFilters, setShowFilters] = useState(false);
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
-    const itemsPerPage = 10;
+    const itemsPerPage = 14;
 
     useEffect(() => {
         fetchInitialData();
@@ -34,7 +35,7 @@ const MovieList = () => {
 
     useEffect(() => {
         fetchMovies();
-    }, [ currentPage]);
+    }, [currentPage]);
 
     const fetchInitialData = async () => {
         try {
@@ -106,13 +107,18 @@ const MovieList = () => {
     const handleReset = () => {
         setSearchTerm('');
         setSelectedActor('');
+        setSelectedGenre('');
         setReleaseYear('');
         setCurrentPage(1);
         fetchMovies();
     };
 
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
+    };
+
+    const toggleFilters = () => {
+        setShowFilters(!showFilters);
     };
 
     const renderPagination = () => {
@@ -121,7 +127,7 @@ const MovieList = () => {
                 <Pagination 
                     count={totalPages}
                     page={currentPage}
-                    onChange={(event, value) => handlePageChange(value)}
+                    onChange={handlePageChange}
                     color="primary"
                     size="large"
                     sx={{
@@ -144,110 +150,197 @@ const MovieList = () => {
         );
     };
 
-    const MovieCard = ({ movie }) => (
-        <div className="movie-card">
-            <div className="movie-image">
-                <img src={movie.image} alt={movie.movieName} />
-            </div>
-            <div className="movie-info">
-                <h3>{movie.movieName}</h3>
-                <p className="movie-meta">
-                    <span className="year">{new Date(movie.releaseDate).getFullYear()}</span>
-                    <span className="duration">120 phút</span>
-                </p>
-                <p className="genres">{movie.genres.map(g => g.name).join(', ')}</p>
-                <div className="movie-buttons">
-                    <Link to={`/movie/${movie.movieId}`} className="btn-watch-now">
-                        Xem ngay
-                    </Link>
+    const MovieCard = ({ movie }) => {
+        const releaseYear = new Date(movie.releaseDate).getFullYear();
+        const randomRating = (Math.floor(Math.random() * 20) + 70) / 10; // Random rating between 7.0-9.0
+        
+        return (
+            <div className="movie-card">
+                <div className="movie-card-overlay">
+                    <div className="movie-rating">
+                        <FaStar /> {randomRating.toFixed(1)}
+                    </div>
+                    <div className="movie-image">
+                        <img src={movie.image} alt={movie.movieName} />
+                        <div className="movie-hover-info">
+                            <div className="movie-quick-info">
+                                <div><FaClock /> 120 phút</div>
+                                <div>{releaseYear}</div>
+                            </div>
+                            <Link to={`/movie/${movie.movieId}`} className="btn-watch-now">
+                                <FaPlay /> Xem ngay
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+                <div className="movie-info">
+                    <h3 title={movie.movieName}>{movie.movieName}</h3>
+                    <div className="genres-badges">
+                        {movie.genres.map(g => (
+                            <Badge key={g.genreId} bg="secondary" className="genre-badge">
+                                {g.name}
+                            </Badge>
+                        ))}
+                    </div>
                 </div>
             </div>
+        );
+    };
+
+    if (loading) return (
+        <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <div>Đang tải...</div>
         </div>
     );
-
-    if (loading) return <div className="loading">Đang tải...</div>;
-    if (error) return <div className="error">{error}</div>;
+    
+    if (error) return <div className="error-container">{error}</div>;
 
     return (
         <Container fluid className="movie-list-container">
-            <Row>
-                <Col md={3}>
-                    <div className="filters-sidebar">
-                        <div className="filter-section">
-                            <h4>Thể Loại</h4>
-                            <div className="filter-list">
-                                {genres && genres.length > 0 ? genres.map(genre => (
-                                    <Form.Check
-                                        key={genre.genreId}
-                                        type="checkbox"
-                                        label={genre.name}
-                                        checked={selectedGenre === genre.name}
-                                        onChange={() => setSelectedGenre(selectedGenre === genre.name ? '' : genre.name)}
-                                    />
-                                )) : <p>Không có thể loại</p>}
-                            </div>
-                        </div>
-                    </div>
-                </Col>
+            <div className="movie-list-header">
+                <h1 className="page-title">Khám phá phim</h1>
+                <div className="filter-toggle-mobile">
+                    <Button 
+                        variant="outline-danger" 
+                        onClick={toggleFilters}
+                        className="filter-toggle-btn"
+                    >
+                        {showFilters ? <FaTimes /> : <FaFilter />} Bộ lọc
+                    </Button>
+                </div>
+            </div>
 
-                <Col md={9}>
-                    <div className="search-container">
-                        <Form onSubmit={handleSearch} className="d-flex align-items-center gap-2">
+            <Row>
+                <Col lg={3} md={4} className={`filters-col ${showFilters ? 'show-filters' : ''}`}>
+                    <div className="filters-sidebar">
+                        <div className="filter-header">
+                            <h4>Bộ lọc phim</h4>
+                            <Button 
+                                variant="link" 
+                                className="filter-close" 
+                                onClick={toggleFilters}
+                            >
+                                <FaTimes />
+                            </Button>
+                        </div>
+                        
+                        <div className="filter-section">
+                            <h5>Tìm kiếm</h5>
                             <Form.Control
-                                size="sm"
                                 type="text"
-                                placeholder="Tìm kiếm phim..."
+                                placeholder="Tên phim..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="search-input"
+                                className="mb-3"
                             />
+                        </div>
+                        
+                        <div className="filter-section">
+                            <h5>Diễn viên</h5>
                             <Form.Control
-                                size="sm"
                                 type="text"
-                                placeholder="Tìm theo diễn viên..."
+                                placeholder="Tên diễn viên..."
                                 value={selectedActor}
                                 onChange={(e) => setSelectedActor(e.target.value)}
-                                className="search-input"
+                                className="mb-3"
                             />
+                        </div>
+                        
+                        <div className="filter-section">
+                            <h5>Năm phát hành</h5>
                             <Form.Control
-                                size="sm"
                                 type="number"
                                 placeholder="Năm phát hành..."
                                 min="1900"
                                 max={new Date().getFullYear()}
                                 value={releaseYear}
                                 onChange={(e) => setReleaseYear(e.target.value)}
-                                className="search-input"
+                                className="mb-3"
                             />
+                        </div>
+                        
+                        <div className="filter-section">
+                            <h5>Thể Loại</h5>
+                            <div className="filter-list">
+                                {genres && genres.length > 0 ? genres.map(genre => (
+                                    <Form.Check
+                                        key={genre.genreId}
+                                        type="checkbox"
+                                        id={`genre-${genre.genreId}`}
+                                        label={genre.name}
+                                        checked={selectedGenre === genre.name}
+                                        onChange={() => setSelectedGenre(selectedGenre === genre.name ? '' : genre.name)}
+                                        className="genre-checkbox"
+                                    />
+                                )) : <p>Không có thể loại</p>}
+                            </div>
+                        </div>
+                        
+                        <div className="filter-actions">
                             <Button 
-                                style={{backgroundColor: '#e50914', border: 'none', width: '100px'}} 
-                                type="submit" 
-                                variant="primary" 
-                                size="sm"
+                                variant="danger" 
+                                type="button" 
+                                onClick={handleSearch}
+                                className="w-100 mb-2"
                             >
                                 <FaSearch /> Tìm kiếm
                             </Button>
                             <Button 
-                                style={{backgroundColor: '#6c757d', border: 'none', width: '100px'}} 
+                                variant="outline-secondary" 
                                 type="button" 
-                                variant="secondary" 
-                                size="sm"
+                                onClick={handleReset}
+                                className="w-100"
+                            >
+                                <FaTimes /> Xóa bộ lọc
+                            </Button>
+                        </div>
+                    </div>
+                </Col>
+
+                <Col lg={9} md={8}>
+                    <div className="search-container-mobile">
+                        <InputGroup>
+                            <Form.Control
+                                type="text"
+                                placeholder="Tìm kiếm phim..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <Button 
+                                variant="danger" 
+                                onClick={handleSearch}
+                            >
+                                <FaSearch />
+                            </Button>
+                        </InputGroup>
+                    </div>
+
+                    {movies && movies.length > 0 ? (
+                        <>
+                            <div className="movies-container">
+                                {movies.map(movie => (
+                                    <MovieCard key={movie.movieId} movie={movie} />
+                                ))}
+                            </div>
+                            
+                            <div className="pagination-container">
+                                {renderPagination()}
+                            </div>
+                        </>
+                    ) : (
+                        <div className="no-movies">
+                            <FaTimes size={40} />
+                            <h3>Không tìm thấy phim nào</h3>
+                            <p>Vui lòng thử lại với các tiêu chí tìm kiếm khác</p>
+                            <Button 
+                                variant="outline-danger" 
                                 onClick={handleReset}
                             >
-                                Làm mới
+                                Xóa bộ lọc
                             </Button>
-                        </Form>
-                    </div>
-
-                    <div className="movies-container">
-                        {movies && movies.length > 0 ? movies.map(movie => (
-                            <MovieCard key={movie.movieId} movie={movie} />
-                        )) : <div className="no-movies">Không có phim nào</div>}
-                    </div>
-
-                    <div className="pagination-container">
-                        {renderPagination()}
-                    </div>
+                        </div>
+                    )}
                 </Col>
             </Row>
         </Container>
