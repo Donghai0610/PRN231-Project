@@ -46,6 +46,8 @@ body {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  background-color: #1a1a1a;
+  min-height: 100vh;
 }
 
 .navi {
@@ -76,45 +78,53 @@ body {
 }
 
 .section-title {
+  color: #ffffff;
   font-size: 24px;
+  font-weight: 600;
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 2px solid #e50914;
-  color: #1a1a1a;
 }
 
 .movie-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
   margin-bottom: 30px;
 }
 
-.movie-item {
-  background: #fff;
-  border-radius: 12px;
+.movie-item, .slider-movie-item {
+  background: #2a2a2a;
+  border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #eaeaea;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
 }
 
-.movie-item:hover {
+.movie-item:hover, .slider-movie-item:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .image-container {
   position: relative;
-  width: 100%;
-  height: 300px;
+  padding-top: 150%;
   overflow: hidden;
 }
 
 .image-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
+}
+
+.movie-item:hover .image-container img,
+.slider-movie-item:hover .image-container img {
+  transform: scale(1.05);
 }
 
 .overlay-icon {
@@ -122,10 +132,10 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.7);
-  border-radius: 50%;
+  background: rgba(229, 9, 20, 0.9);
   width: 60px;
   height: 60px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -138,63 +148,80 @@ body {
   opacity: 1;
 }
 
-.image-container:hover img {
-  transform: scale(1.05);
-}
-
-.movie-item a {
-  color: #1a1a1a;
-  font-weight: 600;
+.movie-item a, .slider-movie-item a {
+  color: #ffffff;
   text-decoration: none;
   font-size: 16px;
-  text-align: center;
-  padding: 10px;
+  font-weight: 600;
   display: block;
-  transition: color 0.3s ease;
+  padding: 10px;
+  transition: color 0.2s ease;
 }
 
-.movie-item a:hover {
+.movie-item a:hover, .slider-movie-item a:hover {
   color: #e50914;
 }
 
-.movie-item ul {
+.movie-item ul, .slider-movie-item ul {
   list-style: none;
   padding: 0 10px 10px;
   margin: 0;
-  font-size: 14px;
 }
 
-.movie-item ul li {
-  color: #666;
+.movie-item ul li, .slider-movie-item ul li {
+  color: #999;
+  font-size: 14px;
   margin-bottom: 5px;
 }
 
-.movie-item ul li span {
-  color: #1a1a1a;
-  font-weight: 600;
+.movie-item ul li span, .slider-movie-item ul li span {
+  color: #666;
+  margin-right: 5px;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .movie-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+/* Slider customization */
+.slick-slider {
+  margin: 0 -10px;
 }
 
-@media (max-width: 900px) {
-  .movie-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.slick-slide {
+  padding: 0 10px;
 }
 
-@media (max-width: 600px) {
-  .movie-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .image-container {
-    height: 400px;
-  }
+.slick-dots {
+  bottom: -30px;
+}
+
+.slick-dots li button:before {
+  color: #666;
+}
+
+.slick-dots li.slick-active button:before {
+  color: #e50914;
+}
+
+.slick-prev, .slick-next {
+  width: 40px;
+  height: 40px;
+  background: rgba(229, 9, 20, 0.9);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.slick-prev:hover, .slick-next:hover {
+  background: #e50914;
+}
+
+.slick-prev {
+  left: -20px;
+}
+
+.slick-next {
+  right: -20px;
+}
+
+.slick-prev:before, .slick-next:before {
+  font-size: 24px;
 }
 
 /* Thêm CSS cho slider */
@@ -327,21 +354,407 @@ body {
 
 /* Modal styles */
 .modal-content {
-  background: #fff;
-  border-radius: 12px;
+  background-color: #1a1a1a;
   border: none;
+  border-radius: 8px;
 }
 
 .modal-header {
-  border-bottom: 1px solid #eaeaea;
+  border-bottom: 1px solid #333;
   padding: 15px 20px;
 }
 
-.modal-title {
-  color: #1a1a1a;
-  font-weight: 600;
+.modal-header .modal-title {
+  color: #ffffff;
+  font-size: 20px;
 }
 
 .modal-header .close {
+  color: #ffffff;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .carousel .carousel-item {
+    height: 300px;
+  }
+
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel .carousel-item {
+    height: 200px;
+  }
+
+  .movie-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .movie-item a, .slider-movie-item a {
+    font-size: 14px;
+  }
+}
+
+.homepage {
+  background-color: #1a1a1a;
+  min-height: 100vh;
+}
+
+/* Loading styles */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(229, 9, 20, 0.3);
+  border-radius: 50%;
+  border-top-color: #e50914;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message {
+  color: #e50914;
+  text-align: center;
+  padding: 20px;
+  background-color: rgba(229, 9, 20, 0.1);
+  border-radius: 8px;
+  margin: 20px;
+}
+
+/* Carousel enhancements */
+.carousel {
+  margin-bottom: 30px;
+}
+
+.carousel .carousel-item {
+  height: 600px;
+}
+
+.carousel .carousel-item img {
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.5);
+}
+
+.carousel-caption {
+  bottom: 20%;
+  text-align: left;
+  padding: 0 10%;
+}
+
+.carousel-caption h3 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.carousel-caption p {
+  font-size: 1.2rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Home page content */
+.home-page-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Movie sections */
+.movie-section {
+  margin-bottom: 60px;
+}
+
+.section-title {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e50914;
+}
+
+/* Movie grid */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+/* Movie item styling */
+.movie-item, .slider-movie-item {
+  background: #2a2a2a;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+}
+
+.movie-item:hover, .slider-movie-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.image-container {
+  position: relative;
+  padding-top: 150%;
+  overflow: hidden;
+}
+
+.image-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.movie-item:hover .image-container img,
+.slider-movie-item:hover .image-container img {
+  transform: scale(1.05);
+}
+
+/* Play button overlay */
+.overlay-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(229, 9, 20, 0.9);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.image-container:hover .overlay-icon {
+  opacity: 1;
+}
+
+/* Movie info */
+.movie-item a, .slider-movie-item a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  display: block;
+  padding: 12px;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.movie-item a:hover, .slider-movie-item a:hover {
+  color: #e50914;
+}
+
+.movie-item ul, .slider-movie-item ul {
+  list-style: none;
+  padding: 0 12px 12px;
+  margin: 0;
+}
+
+.movie-item ul li, .slider-movie-item ul li {
+  color: #999;
+  font-size: 14px;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.movie-item ul li span, .slider-movie-item ul li span {
   color: #666;
+  margin-right: 5px;
+}
+
+/* Slider customization */
+.slick-slider {
+  margin: 0 -12px;
+}
+
+.slick-slide {
+  padding: 0 12px;
+}
+
+.slick-dots {
+  bottom: -30px;
+}
+
+.slick-dots li button:before {
+  color: #666;
+}
+
+.slick-dots li.slick-active button:before {
+  color: #e50914;
+}
+
+.slick-prev, .slick-next {
+  width: 40px;
+  height: 40px;
+  background: rgba(229, 9, 20, 0.9);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.slick-prev:hover, .slick-next:hover {
+  background: #e50914;
+}
+
+.slick-prev {
+  left: -20px;
+}
+
+.slick-next {
+  right: -20px;
+}
+
+.slick-prev:before, .slick-next:before {
+  font-size: 24px;
+}
+
+/* Modal styling */
+.modal-content {
+  background-color: #1a1a1a;
+  border: none;
+  border-radius: 8px;
+}
+
+.modal-header {
+  border-bottom: 1px solid #333;
+  padding: 15px 20px;
+}
+
+.modal-header .modal-title {
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.modal-header .close {
+  color: #ffffff;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.no-video {
+  color: #999;
+  text-align: center;
+  padding: 40px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .carousel .carousel-item {
+    height: 500px;
+  }
+
+  .carousel-caption {
+    bottom: 15%;
+  }
+
+  .carousel-caption h3 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel .carousel-item {
+    height: 400px;
+  }
+
+  .carousel-caption {
+    bottom: 10%;
+  }
+
+  .carousel-caption h3 {
+    font-size: 1.75rem;
+  }
+
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel .carousel-item {
+    height: 300px;
+  }
+
+  .carousel-caption {
+    bottom: 5%;
+    padding: 0 5%;
+  }
+
+  .carousel-caption h3 {
+    font-size: 1.5rem;
+  }
+
+  .carousel-caption p {
+    font-size: 1rem;
+  }
+
+  .movie-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .movie-item a, .slider-movie-item a {
+    font-size: 14px;
+  }
 }
