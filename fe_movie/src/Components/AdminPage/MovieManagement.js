@@ -290,6 +290,7 @@ const MovieManagement = () => {
     // Kiểm tra trạng thái của phim
     if (movie.isActive) {
       // Nếu phim đang active, xác nhận để xóa phim
+      const isDarkMode = document.body.classList.contains('dark-mode');
       const result = await Swal.fire({
         title: 'Bạn có chắc chắn muốn xóa phim này?',
         text: "Phim sẽ bị xóa vĩnh viễn!",
@@ -298,20 +299,35 @@ const MovieManagement = () => {
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
         confirmButtonText: 'Xóa',
-        cancelButtonText: 'Hủy'
+        cancelButtonText: 'Hủy',
+        background: isDarkMode ? '#1e1e1e' : '#ffffff',
+        color: isDarkMode ? '#f1f1f1' : '#1a1a1a'
       });
 
       if (result.isConfirmed) {
         try {
           await Movie_Service.DeleteMovie(movie.movieId); // Gọi hàm xóa phim từ service
-          Swal.fire('Đã xóa!', 'Phim đã được xóa thành công.', 'success');
+          Swal.fire({
+            title: 'Đã xóa!', 
+            text: 'Phim đã được xóa thành công.',
+            icon: 'success',
+            background: isDarkMode ? '#1e1e1e' : '#ffffff',
+            color: isDarkMode ? '#f1f1f1' : '#1a1a1a'
+          });
           loadMovies(page * rowsPerPage, rowsPerPage); // Tải lại danh sách phim sau khi xóa
         } catch (error) {
-          Swal.fire('Lỗi!', 'Có lỗi xảy ra khi xóa phim.', 'error');
+          Swal.fire({
+            title: 'Lỗi!', 
+            text: 'Có lỗi xảy ra khi xóa phim.',
+            icon: 'error',
+            background: isDarkMode ? '#1e1e1e' : '#ffffff',
+            color: isDarkMode ? '#f1f1f1' : '#1a1a1a'
+          });
         }
       }
     } else {
       // Nếu phim đang inactive, xác nhận để kích hoạt lại phim
+      const isDarkMode = document.body.classList.contains('dark-mode');
       const result = await Swal.fire({
         title: 'Bạn có chắc chắn muốn kích hoạt phim này?',
         text: "Phim sẽ được hiển thị trở lại.",
@@ -320,16 +336,30 @@ const MovieManagement = () => {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Kích hoạt',
-        cancelButtonText: 'Hủy'
+        cancelButtonText: 'Hủy',
+        background: isDarkMode ? '#1e1e1e' : '#ffffff',
+        color: isDarkMode ? '#f1f1f1' : '#1a1a1a'
       });
 
       if (result.isConfirmed) {
         try {
           await Movie_Service.ActiveMovie(movie.movieId); // Gọi hàm kích hoạt phim từ service
-          Swal.fire('Đã kích hoạt!', 'Phim đã được kích hoạt thành công.', 'success');
+          Swal.fire({
+            title: 'Đã kích hoạt!', 
+            text: 'Phim đã được kích hoạt thành công.',
+            icon: 'success',
+            background: isDarkMode ? '#1e1e1e' : '#ffffff',
+            color: isDarkMode ? '#f1f1f1' : '#1a1a1a'
+          });
           loadMovies(page * rowsPerPage, rowsPerPage); // Tải lại danh sách phim sau khi kích hoạt
         } catch (error) {
-          Swal.fire('Lỗi!', 'Có lỗi xảy ra khi kích hoạt phim.', 'error');
+          Swal.fire({
+            title: 'Lỗi!', 
+            text: 'Có lỗi xảy ra khi kích hoạt phim.',
+            icon: 'error',
+            background: isDarkMode ? '#1e1e1e' : '#ffffff',
+            color: isDarkMode ? '#f1f1f1' : '#1a1a1a'
+          });
         }
       }
     }
