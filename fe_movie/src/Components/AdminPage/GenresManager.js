@@ -339,6 +339,7 @@ const GenresManager = () => {
             <Box className="modal-actions">
               <Button 
                 variant="outlined" 
+                color="inherit"
                 size="small"
                 onClick={() => {
                   setShowModal(false);
@@ -400,6 +401,7 @@ const GenresManager = () => {
             <Box className="modal-actions">
               <Button 
                 variant="outlined" 
+                color="inherit"
                 size="small"
                 onClick={() => setShowDeleteModal(false)}
                 className="cancel-button"
@@ -429,7 +431,11 @@ const GenresManager = () => {
       </Modal>
 
       {/* Toast notifications */}
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer 
+        position="top-right" 
+        autoClose={3000}
+        theme={document.body.classList.contains('dark-mode') ? 'dark' : 'light'}
+      />
     </Box>
   );
 };

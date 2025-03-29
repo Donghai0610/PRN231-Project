@@ -810,6 +810,14 @@ body.dark-mode .admin-content {
     color: #f1f1f1;
 }
 
+body:not(.dark-mode) .admin-wrapper,
+body:not(.dark-mode) .admin-container,
+body:not(.dark-mode) .admin-dashboard,
+body:not(.dark-mode) .admin-content {
+    background-color: #ffffff;
+    color: #1a1a1a;
+}
+
 body.dark-mode .admin-sidebar {
     background-color: #1e1e1e;
     border-color: #333;
@@ -943,5 +951,137 @@ body.dark-mode input[type="datetime-local"] {
 
 body.dark-mode input::-webkit-calendar-picker-indicator {
     filter: invert(1);
+}
+
+/* Material UI components in dark mode */
+body.dark-mode .MuiPaper-root {
+    background-color: #1e1e1e !important;
+    color: #f1f1f1 !important;
+}
+
+body.dark-mode .MuiTypography-root {
+    color: #f1f1f1 !important;
+}
+
+body.dark-mode .MuiTableCell-head {
+    background-color: #2a2a2a !important;
+    color: #f1f1f1 !important;
+    border-bottom-color: #333 !important;
+}
+
+body.dark-mode .MuiTableCell-body {
+    color: #f1f1f1 !important;
+    border-bottom-color: #333 !important;
+}
+
+body.dark-mode .MuiTableRow-root:hover {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+body.dark-mode .MuiTablePagination-root {
+    color: #f1f1f1 !important;
+}
+
+body.dark-mode .MuiIconButton-root {
+    color: #f1f1f1 !important;
+}
+
+body.dark-mode .MuiDivider-root {
+    background-color: #333 !important;
+}
+
+body.dark-mode .MuiInputBase-root {
+    color: #f1f1f1 !important;
+}
+
+body.dark-mode .MuiInputLabel-root {
+    color: #ccc !important;
+}
+
+body.dark-mode .MuiOutlinedInput-notchedOutline {
+    border-color: #333 !important;
+}
+
+body.dark-mode .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #555 !important;
+}
+
+body.dark-mode .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #e50914 !important;
+}
+
+body.dark-mode .MuiButtonBase-root {
+    color: #f1f1f1 !important;
+}
+
+body.dark-mode .MuiButton-contained:not(.MuiButton-containedPrimary):not(.MuiButton-containedSecondary) {
+    background-color: #2a2a2a !important;
+    color: #f1f1f1 !important;
+}
+
+body.dark-mode .MuiButton-containedPrimary {
+    background-color: #e50914 !important;
+}
+
+body.dark-mode .MuiButton-outlined {
+    border-color: #555 !important;
+}
+
+body.dark-mode .MuiDialog-paper {
+    background-color: #1e1e1e !important;
+    color: #f1f1f1 !important;
+}
+
+body.dark-mode .MuiAlert-root {
+    background-color: #2a2a2a !important;
+}
+
+body.dark-mode .MuiAlert-standardSuccess {
+    color: #5cff8a !important;
+}
+
+body.dark-mode .MuiAlert-standardError {
+    color: #ff6b6b !important;
+}
+
+body.dark-mode .MuiAlert-standardWarning {
+    color: #ffda79 !important;
+}
+
+body.dark-mode .MuiAlert-standardInfo {
+    color: #67e8f9 !important;
+}
+
+/* Light mode cho các component Material UI */
+body:not(.dark-mode) .MuiPaper-root {
+    background-color: #ffffff !important;
+    color: #1a1a1a !important;
+}
+
+body:not(.dark-mode) .MuiTableCell-head {
+    background-color: #f5f5f5 !important;
+    border-bottom-color: #ddd !important;
+}
+
+body:not(.dark-mode) .MuiTableCell-body {
+    border-bottom-color: #ddd !important;
+}
+
+body:not(.dark-mode) .MuiTableRow-root:hover {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+body:not(.dark-mode) .admin-content {
+    background-color: #ffffff;
+    color: #1a1a1a;
+}
+
+/* Dialog title trong GenresManager */
+body.dark-mode .modal-title {
+    color: #f1f1f1 !important;
+}
+
+body:not(.dark-mode) .modal-title {
+    color: #1a1a1a !important;
 }
 

@@ -1,5 +1,18 @@
 import { useState, useEffect } from "react";
-import { Container, Row, Col, Table, Button } from "react-bootstrap";
+import {
+  Container,
+  Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Button,
+  Typography,
+  Box,
+  Chip
+} from "@mui/material";
 import User_Service from "../../services/user";
 import Swal from "sweetalert2";
 
@@ -68,52 +81,78 @@ function AccountManager() {
     }
   };
 
-  if (loading) return <div className="loading-container p-5 text-center"><i className="fas fa-spinner fa-spin me-2"></i>Đang tải...</div>;
+  if (loading) {
+    return (
+      <Box className="loading-container p-5 text-center">
+        <div className="loading-spinner" style={{ margin: '0 auto' }}></div>
+        <Typography variant="body1" sx={{ mt: 2 }}>Đang tải...</Typography>
+      </Box>
+    );
+  }
 
   return (
-    <Container fluid className="mt-4 p-4">
-      <h2 className="mb-4 fw-bold">Quản lý tài khoản người dùng</h2>
-      <div className="table-responsive">
-        <Table striped bordered hover className="account-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Email</th>
-              <th>Họ tên</th>
-              <th>Trạng thái</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.userName}</td>
-                <td>{user.email}</td>
-                <td>
-                  <span className={`badge ${user.isActive ? 'bg-success' : 'bg-danger'}`}>
-                    {user.isActive ? 'Đang hoạt động' : 'Đã khóa'}
-                  </span>
-                </td>
-                <td>
-                  <Button
-                    variant={user.isActive ? "outline-danger" : "outline-success"}
-                    onClick={() => handleUpdateActive(user.id, user.isActive)}
-                    size="sm"
-                    className="px-3"
-                  >
-                    {user.isActive ? "Khóa tài khoản" : "Mở khóa tài khoản"}
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </div>
+    <Container maxWidth={false} className="mt-4 p-4 admin-content" disableGutters sx={{ px: 3 }}>
+      <Typography variant="h4" component="h2" className="mb-4 fw-bold" gutterBottom>
+        Quản lý tài khoản người dùng
+      </Typography>
+      
+      <Paper elevation={3} sx={{ width: '100%', overflow: 'hidden', borderRadius: 2 }}>
+        <TableContainer sx={{ width: '100%' }}>
+          <Table stickyHeader aria-label="user accounts table" sx={{ width: '100%', tableLayout: 'fixed' }}>
+            <TableHead>
+              <TableRow>
+                <TableCell width="10%">ID</TableCell>
+                <TableCell width="30%">Email</TableCell>
+                <TableCell width="25%">Họ tên</TableCell>
+                <TableCell width="15%">Trạng thái</TableCell>
+                <TableCell width="20%" align="center">Thao tác</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id} hover>
+                  <TableCell sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.id}</TableCell>
+                  <TableCell sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.userName}</TableCell>
+                  <TableCell sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</TableCell>
+                  <TableCell>
+                    <Chip 
+                      label={user.isActive ? 'Đang hoạt động' : 'Đã khóa'} 
+                      color={user.isActive ? 'success' : 'error'} 
+                      size="small"
+                      variant="filled"
+                    />
+                  </TableCell>
+                  <TableCell align="center">
+                    <Button
+                      variant="outlined"
+                      color={user.isActive ? "error" : "success"}
+                      onClick={() => handleUpdateActive(user.id, user.isActive)}
+                      size="small"
+                      sx={{ minWidth: '140px' }}
+                    >
+                      {user.isActive ? "Khóa tài khoản" : "Mở khóa tài khoản"}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+      
       {users.length === 0 && !loading && (
-        <div className="text-center p-5">
-          <p>Không có tài khoản nào.</p>
-        </div>
+        <Box sx={{ 
+          textAlign: 'center', 
+          p: 5, 
+          mt: 2, 
+          backgroundColor: theme => theme.palette.background.paper,
+          borderRadius: 2,
+          boxShadow: 1
+        }}>
+          <Typography variant="h6" color="text.secondary">
+            Không có tài khoản nào.
+          </Typography>
+        </Box>
       )}
     </Container>
   );

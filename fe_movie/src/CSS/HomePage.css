@@ -46,7 +46,7 @@ body {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #1a1a1a;
+  background-color: #ffffff;
   min-height: 100vh;
 }
 
@@ -78,7 +78,7 @@ body {
 }
 
 .section-title {
-  color: #ffffff;
+  color: #1a1a1a;
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 20px;
@@ -94,11 +94,12 @@ body {
 }
 
 .movie-item, .slider-movie-item {
-  background: #2a2a2a;
+  background: #ffffff;
   border-radius: 8px;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   height: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .movie-item:hover, .slider-movie-item:hover {
@@ -227,6 +228,7 @@ body {
 /* Thêm CSS cho slider */
 .slider-movie-item {
   padding: 10px;
+  background: #ffffff;
 }
 
 .slider-movie-item .image-container {
@@ -254,7 +256,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.7);
+  background: rgba(229, 9, 20, 0.9);
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -271,9 +273,11 @@ body {
 }
 
 .slider-movie-item a {
+  display: block;
   color: #1a1a1a;
   font-weight: 600;
-  transition: color 0.3s ease;
+  margin: 10px 0 5px;
+  transition: color 0.3s;
 }
 
 .slider-movie-item a:hover {
@@ -281,20 +285,18 @@ body {
 }
 
 .slider-movie-item ul {
-  list-style: none;
   padding: 0;
   margin: 0;
-  font-size: 14px;
+  list-style: none;
 }
 
 .slider-movie-item ul li {
-  color: #666;
-  margin-bottom: 5px;
+  color: #555;
+  font-size: 14px;
 }
 
 .slider-movie-item ul li span {
-  color: #1a1a1a;
-  font-weight: 600;
+  color: #777;
 }
 
 /* Tùy chỉnh nút điều hướng của slider */
@@ -354,23 +356,24 @@ body {
 
 /* Modal styles */
 .modal-content {
-  background-color: #1a1a1a;
+  background-color: #ffffff;
   border: none;
   border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .modal-header {
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #eaeaea;
   padding: 15px 20px;
 }
 
 .modal-header .modal-title {
-  color: #ffffff;
+  color: #1a1a1a;
   font-size: 20px;
 }
 
 .modal-header .close {
-  color: #ffffff;
+  color: #1a1a1a;
 }
 
 .modal-body {
@@ -407,7 +410,7 @@ body {
 }
 
 .homepage {
-  background-color: #1a1a1a;
+  background-color: #ffffff;
   min-height: 100vh;
 }
 
@@ -418,8 +421,8 @@ body {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: #1a1a1a;
-  color: #ffffff;
+  background-color: #ffffff;
+  color: #1a1a1a;
 }
 
 .spinner {
@@ -647,31 +650,6 @@ body {
 
 .slick-prev:before, .slick-next:before {
   font-size: 24px;
-}
-
-/* Modal styling */
-.modal-content {
-  background-color: #1a1a1a;
-  border: none;
-  border-radius: 8px;
-}
-
-.modal-header {
-  border-bottom: 1px solid #333;
-  padding: 15px 20px;
-}
-
-.modal-header .modal-title {
-  color: #ffffff;
-  font-size: 20px;
-}
-
-.modal-header .close {
-  color: #ffffff;
-}
-
-.modal-body {
-  padding: 20px;
 }
 
 .video-container {
