@@ -64,9 +64,11 @@ function Header() {
     if (darkMode) {
       document.body.classList.add("dark-mode");
       localStorage.setItem("darkMode", "true");
+      document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       document.body.classList.remove("dark-mode");
       localStorage.setItem("darkMode", "false");
+      document.documentElement.setAttribute('data-theme', 'light');
     }
   }, [darkMode]);
 
@@ -75,6 +77,7 @@ function Header() {
   };
 
   const handleLogout = () => {
+    const isDarkMode = document.body.classList.contains('dark-mode');
     Swal.fire({
       title: "Đăng xuất",
       text: "Bạn có chắc chắn muốn đăng xuất?",
@@ -84,6 +87,8 @@ function Header() {
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Đăng xuất",
       cancelButtonText: "Hủy",
+      background: isDarkMode ? '#1e1e1e' : '#ffffff',
+      color: isDarkMode ? '#f1f1f1' : '#1a1a1a'
     }).then((result) => {
       if (result.isConfirmed) {
         logout();
