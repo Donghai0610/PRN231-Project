@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Form, InputGroup, Modal, Toast, ToastContainer } from "react-bootstrap";
+import { Card, Button, Form, InputGroup, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../CSS/LoginRegister.css";
 import Auth_Services from "../../services/auth";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginRegister = () => {
   const [currentForm, setCurrentForm] = useState("login");
@@ -15,14 +16,11 @@ const LoginRegister = () => {
   const [remember, setRemember] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [resetToken, setResetToken] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-  const [popupVisible, setPopupVisible] = useState(false);
-  const [popupContent, setPopupContent] = useState({ title: "", message: "" });
   const [resetValidationErrors, setResetValidationErrors] = useState({});
   const navigate = useNavigate();
 
@@ -71,8 +69,20 @@ const LoginRegister = () => {
         toast.error("Đăng nhập thất bại, vui lòng thử lại!");
       }
     } catch (error) {
-      console.error("Lỗi đăng nhập:", error.response?.data || error.message);
-      toast.error(error.response?.data || "Đã xảy ra lỗi khi đăng nhập");
+      console.error("Lỗi đăng nhập:", error);
+      if (error.message) {
+        toast.error(error.message);
+      } else if (error.response && error.response.data) {
+        if (typeof error.response.data === 'string') {
+          toast.error(error.response.data);
+        } else if (error.response.data.message) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error("Đã xảy ra lỗi khi đăng nhập");
+        }
+      } else {
+        toast.error("Đã xảy ra lỗi khi đăng nhập");
+      }
     }
   };
 
@@ -138,12 +148,26 @@ const LoginRegister = () => {
     try {
         const response = await Auth_Services.register(username, password, email);
         console.log("Đăng ký thành công", response);
-        toast.success("Đăng ký tài khoản thành công!");
-        setShowSuccessModal(true);
+        toast.success("Đăng ký tài khoản thành công! Vui lòng kiểm tra email, ấn xác nhận để kích hoạt tài khoản!");
         setCurrentForm("login");
     } catch (error) {
         console.error("Lỗi đăng ký:", error);
-        toast.error(error.response?.data || "Đã xảy ra lỗi khi đăng ký");
+        if (error.message) {
+            toast.error(error.message);
+        } else if (error.response && error.response.data) {
+            if (Array.isArray(error.response.data)) {
+                const errorMessages = error.response.data.map(err => err.description).join(', ');
+                toast.error(errorMessages);
+            } else if (typeof error.response.data === 'string') {
+                toast.error(error.response.data);
+            } else if (error.response.data.message) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error("Đã xảy ra lỗi khi đăng ký");
+            }
+        } else {
+            toast.error("Đã xảy ra lỗi khi đăng ký");
+        }
     }
 };
 
@@ -166,7 +190,19 @@ const LoginRegister = () => {
       }
     } catch (error) {
       console.error("Lỗi gửi yêu cầu quên mật khẩu:", error);
-      toast.error(error.response?.data || "Đã xảy ra lỗi khi gửi yêu cầu");
+      if (error.message) {
+        toast.error(error.message);
+      } else if (error.response && error.response.data) {
+        if (typeof error.response.data === 'string') {
+          toast.error(error.response.data);
+        } else if (error.response.data.message) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error("Đã xảy ra lỗi khi gửi yêu cầu");
+        }
+      } else {
+        toast.error("Đã xảy ra lỗi khi gửi yêu cầu");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -193,7 +229,19 @@ const LoginRegister = () => {
       }
     } catch (error) {
       console.error("Lỗi đặt lại mật khẩu:", error);
-      toast.error(error.response?.data || "Đã xảy ra lỗi khi đặt lại mật khẩu");
+      if (error.message) {
+        toast.error(error.message);
+      } else if (error.response && error.response.data) {
+        if (typeof error.response.data === 'string') {
+          toast.error(error.response.data);
+        } else if (error.response.data.message) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error("Đã xảy ra lỗi khi đặt lại mật khẩu");
+        }
+      } else {
+        toast.error("Đã xảy ra lỗi khi đặt lại mật khẩu");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -211,7 +259,18 @@ const LoginRegister = () => {
   };
   return (
     <div className="login-register-container">
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={document.body.classList.contains('dark-mode') ? 'dark' : 'light'}
+      />
       <Card className="text-center border-0">
         <Card.Body>
           <div className="tabs mb-4">
@@ -406,24 +465,6 @@ const LoginRegister = () => {
                 </Button>
               </Form>
             )}
-            <Modal
-              show={showSuccessModal}
-              onHide={() => setShowSuccessModal(false)}
-              backdrop="static"
-              centered
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>Tạo Tài Khoản Thành Công</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <p>Tài Khoản Của Bạn Đã Được Tạo Thành Công. Vui Lòng Kiểm Tra Email, Ấn Xác Nhận Để Kích Hoạt Tài Khoản!</p>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={() => setShowSuccessModal(false)}>
-                  Close
-                </Button>
-              </Modal.Footer>
-            </Modal>
             {currentForm === "forgotPassword" && (
               <>
                 <Form onSubmit={handleForgotPassword}>
@@ -532,17 +573,6 @@ const LoginRegister = () => {
           </div>
         </Card.Body>
       </Card>
-      <Modal show={popupVisible} onHide={() => setPopupVisible(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>{popupContent.title}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{popupContent.message}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={() => setPopupVisible(false)}>
-            Đóng
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </div>
   );
 };

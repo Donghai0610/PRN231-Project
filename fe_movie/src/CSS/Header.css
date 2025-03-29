@@ -1085,3 +1085,76 @@ body:not(.dark-mode) .modal-title {
     color: #1a1a1a !important;
 }
 
+/* Sweet Alert customization */
+body:not(.dark-mode) .swal2-popup {
+    background-color: #ffffff !important;
+    color: #1a1a1a !important;
+}
+
+body:not(.dark-mode) .swal2-title,
+body:not(.dark-mode) .swal2-html-container {
+    color: #1a1a1a !important;
+}
+
+body:not(.dark-mode) .swal2-icon.swal2-warning {
+    color: #f8bb86 !important;
+    border-color: #f8bb86 !important;
+}
+
+body:not(.dark-mode) .swal2-icon.swal2-error {
+    color: #f27474 !important;
+    border-color: #f27474 !important;
+}
+
+body:not(.dark-mode) .swal2-icon.swal2-success {
+    color: #a5dc86 !important;
+    border-color: #a5dc86 !important;
+}
+
+body:not(.dark-mode) .swal2-styled.swal2-confirm {
+    background-color: #e50914 !important;
+    color: #ffffff !important;
+}
+
+body:not(.dark-mode) .swal2-styled.swal2-cancel {
+    background-color: #6c757d !important;
+    color: #ffffff !important;
+}
+
+/* SweetAlert2 for dark mode */
+body.dark-mode .swal2-popup {
+    background-color: #1e1e1e !important;
+    color: #f1f1f1 !important;
+}
+
+body.dark-mode .swal2-title,
+body.dark-mode .swal2-html-container,
+body.dark-mode .swal2-content {
+    color: #f1f1f1 !important;
+}
+
+body.dark-mode .swal2-input,
+body.dark-mode .swal2-textarea,
+body.dark-mode .swal2-select,
+body.dark-mode .swal2-radio,
+body.dark-mode .swal2-checkbox {
+    background-color: #2a2a2a !important;
+    color: #f1f1f1 !important;
+    border-color: #333 !important;
+}
+
+body.dark-mode .swal2-input::placeholder,
+body.dark-mode .swal2-textarea::placeholder {
+    color: #aaa !important;
+}
+
+body.dark-mode .swal2-validation-message {
+    background-color: #2a2a2a !important;
+    color: #f1f1f1 !important;
+}
+
+body.dark-mode .swal2-footer {
+    border-color: #333 !important;
+    color: #f1f1f1 !important;
+}
+
