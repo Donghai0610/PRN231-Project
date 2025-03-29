@@ -48,6 +48,7 @@ const BlogManagement = () => {
   };
 
   const handleDelete = (blogId) => {
+    const isDarkMode = document.body.classList.contains('dark-mode');
     Swal.fire({
       title: 'Bạn có chắc chắn muốn xóa bài viết này ?',
       text: 'Bạn không thể hoàn tác sau khi xóa!',
@@ -56,7 +57,9 @@ const BlogManagement = () => {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Đồng ý',
-      cancelButtonText  : 'Hủy bỏ'
+      cancelButtonText: 'Hủy bỏ',
+      background: isDarkMode ? '#1e1e1e' : '#ffffff',
+      color: isDarkMode ? '#f1f1f1' : '#1a1a1a'
     }).then((result) => {
       if (result.isConfirmed) {
         BlogService.deleteBlog(blogId)
@@ -64,11 +67,13 @@ const BlogManagement = () => {
           setBlogs(blogs.filter((blog) => blog.blogId !== blogId));
         })
         .catch((error) => console.error('Error deleting blog:', error));
-        Swal.fire(
-          'Đã xóa bài viết!',
-          'Bài viết đã được xóa thành công.',
-          'success'
-        );
+        Swal.fire({
+          title: 'Đã xóa bài viết!',
+          text: 'Bài viết đã được xóa thành công.',
+          icon: 'success',
+          background: isDarkMode ? '#1e1e1e' : '#ffffff',
+          color: isDarkMode ? '#f1f1f1' : '#1a1a1a'
+        });
       }
     });
   };
