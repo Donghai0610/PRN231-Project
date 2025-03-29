@@ -194,6 +194,10 @@ const MovieList = () => {
         const releaseYear = new Date(movie.releaseDate).getFullYear();
         const randomRating = (Math.floor(Math.random() * 20) + 70) / 10; // Random rating between 7.0-9.0
         
+        // Chỉ hiển thị 2 thể loại để tránh quá nhiều badge
+        const displayGenres = movie.genres.slice(0, 2);
+        const remainingGenres = movie.genres.length - 2;
+        
         return (
             <div className="movie-card">
                 <div className="movie-card-overlay">
@@ -216,14 +220,14 @@ const MovieList = () => {
                 <div className="movie-info">
                     <h3 title={movie.movieName}>{movie.movieName}</h3>
                     <div className="genres-badges">
-                        {movie.genres.slice(0, 2).map(g => (
+                        {displayGenres.map(g => (
                             <Badge key={g.genreId} bg="secondary" className="genre-badge">
                                 {g.name}
                             </Badge>
                         ))}
-                        {movie.genres.length > 2 && (
+                        {remainingGenres > 0 && (
                             <Badge bg="secondary" className="genre-badge genre-badge-more">
-                                +{movie.genres.length - 2}
+                                +{remainingGenres}
                             </Badge>
                         )}
                     </div>

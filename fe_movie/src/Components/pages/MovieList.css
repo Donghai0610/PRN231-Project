@@ -82,8 +82,7 @@
 .movies-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 20px 20px;
+    gap: 20px;
     margin-bottom: 40px;
 }
 
@@ -93,11 +92,9 @@
     overflow: hidden;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    height: calc((100vh - 350px) / 2);
-    min-height: 300px;
-    max-height: 450px;
 }
 
 .movie-card:hover {
@@ -127,8 +124,7 @@
 
 .movie-image {
     position: relative;
-    padding-top: 0;
-    height: 75%;
+    padding-top: 150%; /* Tỷ lệ khung hình 2:3 cho poster phim */
     overflow: hidden;
 }
 
@@ -143,7 +139,8 @@
 }
 
 .movie-card:hover .movie-image img {
-    transform: scale(1.05);
+    transform: scale(1.1);
+    filter: brightness(0.7);
 }
 
 .movie-hover-info {
@@ -158,41 +155,11 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
+    z-index: 10;
 }
 
 .movie-card:hover .movie-hover-info {
     opacity: 1;
-}
-
-.movie-quick-info {
-    display: flex;
-    justify-content: space-between;
-    color: #fff;
-    font-size: 14px;
-}
-
-.btn-watch-now {
-    display: inline-block;
-    padding: 8px 20px;
-    background-color: #e50914;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-watch-now:hover {
-    background-color: #cc0812;
-    color: #fff;
-    text-decoration: none;
-    transform: translateY(-2px);
 }
 
 .movie-info {
@@ -203,8 +170,8 @@
 }
 
 .movie-info h3 {
-    margin: 0 0 10px;
-    font-size: 15px;
+    margin: 0 0 8px;
+    font-size: 14px;
     font-weight: 600;
     color: #333;
     overflow: hidden;
@@ -229,8 +196,8 @@
 
 .genre-badge-more {
     background-color: #e50914 !important;
-    font-size: 10px;
-    padding: 3px 6px;
+    font-size: 11px;
+    padding: 5px 8px;
 }
 
 .movie-meta {
@@ -504,9 +471,9 @@
 
 /* Responsive Design */
 @media (max-width: 1400px) {
-    .movie-card {
-        height: calc((100vh - 300px) / 2);
-        min-height: 280px;
+    .movies-container {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
     }
 }
 
@@ -516,9 +483,18 @@
         gap: 15px;
     }
     
-    .movie-card {
-        height: calc((100vh - 280px) / 2);
-        min-height: 260px;
+    .movie-info {
+        padding: 10px;
+    }
+    
+    .movie-info h3 {
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+    
+    .genre-badge, .genre-badge-more {
+        font-size: 10px;
+        padding: 4px 6px;
     }
 }
 
@@ -528,9 +504,121 @@
         gap: 12px;
     }
     
-    .movie-card {
-        height: calc((100vh - 260px) / 2);
-        min-height: 240px;
+    .movie-info {
+        padding: 8px;
+    }
+    
+    .movie-info h3 {
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+    
+    .genres-badges {
+        gap: 4px;
+    }
+    
+    .genre-badge, .genre-badge-more {
+        font-size: 9px;
+        padding: 3px 5px;
+    }
+}
+
+@media (max-width: 767px) {
+    .movies-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    
+    .movie-info {
+        padding: 6px;
+    }
+    
+    .movie-info h3 {
+        font-size: 11px;
+        margin-bottom: 4px;
+    }
+    
+    .genres-badges {
+        gap: 3px;
+    }
+    
+    .genre-badge, .genre-badge-more {
+        font-size: 8px;
+        padding: 2px 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .movies-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    
+    .movie-info {
+        padding: 5px;
+    }
+    
+    .movie-info h3 {
+        font-size: 10px;
+        margin-bottom: 3px;
+    }
+    
+    .genres-badges {
+        gap: 2px;
+    }
+    
+    .genre-badge, .genre-badge-more {
+        font-size: 7px;
+        padding: 1px 3px;
+    }
+}
+
+/* Thêm style để đảm bảo hiển thị đồng nhất */
+.movies-row {
+    margin-bottom: 20px;
+}
+
+.movie-quick-info {
+    display: flex;
+    justify-content: space-between;
+    color: #fff;
+    font-size: 14px;
+}
+
+.btn-watch-now {
+    display: inline-flex;
+    padding: 6px 15px;
+    background-color: #e50914;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-watch-now:hover {
+    background-color: #cc0812;
+    color: #fff;
+    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 991px) {
+    .movie-hover-info {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .btn-watch-now {
+        padding: 5px 12px;
+        font-size: 12px;
+        gap: 4px;
     }
 }
 
@@ -576,19 +664,15 @@
         display: block;
     }
     
-    .movies-container {
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: auto;
-        gap: 10px;
+    .movie-hover-info {
+        padding: 8px;
+        gap: 8px;
     }
     
-    .movie-card {
-        height: calc((100vh - 250px) / 3);
-        min-height: 220px;
-    }
-    
-    .movie-image {
-        height: 70%;
+    .btn-watch-now {
+        padding: 4px 10px;
+        font-size: 11px;
+        gap: 3px;
     }
 }
 
@@ -597,27 +681,14 @@
         font-size: 22px;
     }
     
-    .movies-container {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+    .movie-hover-info {
+        padding: 6px;
+        gap: 6px;
     }
     
-    .movie-card {
-        height: calc((100vh - 230px) / 3);
-        min-height: 200px;
+    .btn-watch-now {
+        padding: 3px 8px;
+        font-size: 10px;
+        gap: 2px;
     }
-    
-    .movie-image {
-        height: 65%;
-    }
-    
-    .genre-badge-more {
-        font-size: 7px;
-        padding: 1px 3px;
-    }
-}
-
-/* Thêm style để đảm bảo hiển thị đồng nhất */
-.movies-row {
-    margin-bottom: 20px;
 } 
