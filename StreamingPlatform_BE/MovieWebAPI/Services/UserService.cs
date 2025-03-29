@@ -36,9 +36,9 @@ namespace MovieWebAPI.Services
         }
 
 
-        public  IQueryable<AppUser> GetAllUsers()
+        public async Task<List<object>> GetUsersWithRolesAsync()
         {
-            return  _userRepository.GetAllUsers();
+            return await _userRepository.GetUsersWithRolesAsync();
         }
 
         // Lấy chi tiết người dùng theo userId

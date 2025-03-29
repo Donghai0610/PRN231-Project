@@ -24,7 +24,7 @@ namespace MovieWebAPI.Controllers
         [EnableQuery]
         public async Task<IActionResult> GetAllUsers()
         {
-            var users =  _userService.GetAllUsers();
+            var users = await _userService.GetUsersWithRolesAsync();
             return Ok(users);
         }
 

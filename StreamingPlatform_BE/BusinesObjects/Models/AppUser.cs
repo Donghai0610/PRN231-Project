@@ -24,7 +24,7 @@ namespace BusinesObjects.Models
 
         // Quan hệ với Blog (One-to-Many)
         public ICollection<Blog> Blogs { get; set; }
-
+        public virtual ICollection<IdentityUserRole<string>> UserRoles { get; set; }
 
 
     }
