@@ -26,7 +26,7 @@ namespace BusinesObjects
         public DbSet<Comment> Comments { get; set; }
         public DbSet<AppUser> AppUsers { get; set; }
         public DbSet<MovieActor> MovieActors { get; set; }
-        public DbSet<MovieGenre> MovieGenres { get; set; }  // Đảm bảo DbSet cho MovieGenre
+        public DbSet<MovieGenre> MovieGenres { get; set; }  
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<IdentityRole> Roles { get; set; }
