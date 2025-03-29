@@ -14,9 +14,10 @@ const BlogReview = () => {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [totalItems, setTotalItems] = useState(0);
     const [searchTitle, setSearchTitle] = useState('');
     const [debouncedSearchTitle] = useDebounce(searchTitle, 1000);
-    const itemsPerPage = 9;
+    const itemsPerPage = 8;
     const [author, setAuthor] = useState(localStorage.getItem('account'));
 
     const fetchBlogs = async (page, searchTerm = "") => {
@@ -24,12 +25,20 @@ const BlogReview = () => {
             setLoading(true);
             setError(null);
             const skip = (page - 1) * itemsPerPage;
+            
             const response = await BlogService.getBlogs(searchTerm, skip, itemsPerPage);
             setBlogs(response);
 
-            const totalItems = await axiosInstance.get('/api/Blog');
-            setTotalPages(Math.ceil(totalItems.data.length / itemsPerPage));
-
+            const params = {};
+            if (searchTerm && searchTerm.trim() !== '') {
+                params.filter = `contains(title, '${searchTerm}')`;
+            }
+            
+            const totalItemsResponse = await axiosInstance.get('/api/Blog', { params });
+            const totalItemsCount = totalItemsResponse.data.length;
+            
+            setTotalItems(totalItemsCount);
+            setTotalPages(Math.ceil(totalItemsCount / itemsPerPage));
         } catch (err) {
             setError('Đã xảy ra lỗi khi tải blog');
             console.error('Error fetching blogs:', err);
@@ -148,6 +157,9 @@ const BlogReview = () => {
                                     className="pagination"
                                 />
                             </Stack>
+                            <Typography variant="body2" className="pagination-info">
+                                Hiển thị {blogs.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {blogs.length > 0 ? Math.min(currentPage * itemsPerPage, totalItems) : 0} trên {totalItems} bài viết
+                            </Typography>
                         </div>
                     )}
                 </>

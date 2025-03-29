@@ -9,6 +9,7 @@ import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import './MovieList.css';
 import axiosInstance from '../../services/axios';
+import { useDebounce } from 'use-debounce';
 
 const MovieList = () => {
     const [movies, setMovies] = useState([]);
@@ -21,13 +22,15 @@ const MovieList = () => {
     const [selectedGenre, setSelectedGenre] = useState('');
     const [selectedActor, setSelectedActor] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 1000);
     const [releaseYear, setReleaseYear] = useState('');
     const [showFilters, setShowFilters] = useState(false);
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
-    const itemsPerPage = 14;
+    const [totalItems, setTotalItems] = useState(0);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         fetchInitialData();
@@ -35,7 +38,7 @@ const MovieList = () => {
 
     useEffect(() => {
         fetchMovies();
-    }, [currentPage]);
+    }, [currentPage, debouncedSearchTerm, selectedGenre, selectedActor, releaseYear]);
 
     const fetchInitialData = async () => {
         try {
@@ -52,7 +55,6 @@ const MovieList = () => {
                 setGenres(genresResponse);
             }
 
-            // Kiểm tra và set actors
             if (actorsResponse && Array.isArray(actorsResponse)) {
                 setActors(actorsResponse);
             } else if (actorsResponse && actorsResponse.data && Array.isArray(actorsResponse.data)) {
@@ -72,36 +74,66 @@ const MovieList = () => {
             setLoading(true);
             const skip = (currentPage - 1) * itemsPerPage;
 
+            // Lấy phim theo trang hiện tại và bộ lọc
             const response = await Movie_Service.GetAllMoviesForUser(
                 selectedGenre,
                 selectedActor,
-                searchTerm,
+                debouncedSearchTerm, // Sử dụng giá trị đã debounce
                 releaseYear,
                 skip,
                 itemsPerPage
             );
-            const totalCount = await axiosInstance.get('/api/Movies?$filter=isActive eq true');
 
-            if (Array.isArray(response.data)) {
-                setMovies(response.data);
-                setTotalPages(Math.ceil(totalCount.data.length / itemsPerPage));
-            } else if (response.data?.value) {
-                setMovies(response.data.value);
-                setTotalPages(Math.ceil(totalCount.data.length / itemsPerPage));
+            // Xây dựng điều kiện tìm kiếm để lấy tổng số phim
+            let filterParams = { $filter: 'isActive eq true' };
+            
+            if (debouncedSearchTerm) {
+                filterParams.$filter += ` and contains(movieName, '${debouncedSearchTerm}')`;
+            }
+            
+            if (selectedGenre) {
+                // Thêm điều kiện thể loại nếu cần
+                filterParams.$filter += ` and genres/any(g: g/name eq '${selectedGenre}')`;
+            }
+            
+            if (selectedActor) {
+                // Thêm điều kiện diễn viên nếu cần
+                filterParams.$filter += ` and actors/any(a: contains(a/actorName, '${selectedActor}'))`;
+            }
+            
+            if (releaseYear) {
+                // Thêm điều kiện năm phát hành nếu cần
+                filterParams.$filter += ` and year(releaseDate) eq ${releaseYear}`;
             }
 
-            setLoading(false);
+            // Lấy tổng số phim thỏa mãn điều kiện để tính số trang
+            const totalCountResponse = await axiosInstance.get('/api/Movies', { params: filterParams });
+            
+            const totalCount = totalCountResponse.data.length || 0;
+            setTotalItems(totalCount);
+            setTotalPages(Math.ceil(totalCount / itemsPerPage));
+
+            // Cập nhật danh sách phim
+            if (Array.isArray(response.data)) {
+                setMovies(response.data);
+            } else if (response.data?.value) {
+                setMovies(response.data.value);
+            } else {
+                setMovies([]);
+            }
+
         } catch (error) {
             console.error('Lỗi khi tải danh sách phim:', error);
             setError('Có lỗi xảy ra khi tải danh sách phim');
+        } finally {
             setLoading(false);
         }
     };
 
     const handleSearch = (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         setCurrentPage(1);
-        fetchMovies();
+        // không cần gọi fetchMovies() vì useEffect sẽ tự động gọi khi debouncedSearchTerm thay đổi
     };
 
     const handleReset = () => {
@@ -110,11 +142,12 @@ const MovieList = () => {
         setSelectedGenre('');
         setReleaseYear('');
         setCurrentPage(1);
-        fetchMovies();
+        // fetchMovies sẽ được gọi tự động khi các state thay đổi
     };
 
     const handlePageChange = (event, value) => {
         setCurrentPage(value);
+        window.scrollTo(0, 0);
     };
 
     const toggleFilters = () => {
@@ -123,30 +156,37 @@ const MovieList = () => {
 
     const renderPagination = () => {
         return (
-            <Stack spacing={2} alignItems="center">
-                <Pagination 
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={handlePageChange}
-                    color="primary"
-                    size="large"
-                    sx={{
-                        '& .MuiPaginationItem-root': {
-                            color: '#666',
-                            '&.Mui-selected': {
-                                backgroundColor: '#e50914',
-                                color: '#fff',
+            <div className="pagination-wrapper">
+                <Stack spacing={2} alignItems="center">
+                    <Pagination 
+                        count={totalPages}
+                        page={currentPage}
+                        onChange={handlePageChange}
+                        color="primary"
+                        size="large"
+                        sx={{
+                            '& .MuiPaginationItem-root': {
+                                color: '#666',
+                                '&.Mui-selected': {
+                                    backgroundColor: '#e50914',
+                                    color: '#fff',
+                                    '&:hover': {
+                                        backgroundColor: '#cc0812',
+                                    },
+                                },
                                 '&:hover': {
-                                    backgroundColor: '#cc0812',
+                                    backgroundColor: 'rgba(229, 9, 20, 0.1)',
                                 },
                             },
-                            '&:hover': {
-                                backgroundColor: 'rgba(229, 9, 20, 0.1)',
-                            },
-                        },
-                    }}
-                />
-            </Stack>
+                        }}
+                    />
+                </Stack>
+                {totalItems > 0 && (
+                    <div className="pagination-info">
+                        Hiển thị {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, totalItems)} trên {totalItems} phim
+                    </div>
+                )}
+            </div>
         );
     };
 
@@ -176,11 +216,16 @@ const MovieList = () => {
                 <div className="movie-info">
                     <h3 title={movie.movieName}>{movie.movieName}</h3>
                     <div className="genres-badges">
-                        {movie.genres.map(g => (
+                        {movie.genres.slice(0, 2).map(g => (
                             <Badge key={g.genreId} bg="secondary" className="genre-badge">
                                 {g.name}
                             </Badge>
                         ))}
+                        {movie.genres.length > 2 && (
+                            <Badge bg="secondary" className="genre-badge genre-badge-more">
+                                +{movie.genres.length - 2}
+                            </Badge>
+                        )}
                     </div>
                 </div>
             </div>

@@ -81,20 +81,23 @@
 
 .movies-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 20px 20px;
     margin-bottom: 40px;
 }
 
 .movie-card {
     background: #fff;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    height: 100%;
     display: flex;
     flex-direction: column;
+    height: calc((100vh - 350px) / 2);
+    min-height: 300px;
+    max-height: 450px;
 }
 
 .movie-card:hover {
@@ -124,7 +127,8 @@
 
 .movie-image {
     position: relative;
-    padding-top: 150%;
+    padding-top: 0;
+    height: 75%;
     overflow: hidden;
 }
 
@@ -192,20 +196,21 @@
 }
 
 .movie-info {
-    padding: 15px;
+    padding: 12px;
     flex: 1;
     display: flex;
     flex-direction: column;
 }
 
 .movie-info h3 {
-    margin: 0 0 12px;
-    font-size: 16px;
+    margin: 0 0 10px;
+    font-size: 15px;
     font-weight: 600;
     color: #333;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    line-height: 1.2;
 }
 
 .genres-badges {
@@ -220,6 +225,12 @@
     background-color: #6c757d;
     padding: 5px 8px;
     border-radius: 4px;
+}
+
+.genre-badge-more {
+    background-color: #e50914 !important;
+    font-size: 10px;
+    padding: 3px 6px;
 }
 
 .movie-meta {
@@ -258,7 +269,22 @@
 }
 
 .pagination-container {
-    margin: 30px 0 10px;
+    margin: 40px 0;
+    text-align: center;
+}
+
+.pagination-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.pagination-info {
+    color: #999;
+    font-size: 14px;
+    margin-top: 8px;
+    text-align: center;
 }
 
 .loading-container {
@@ -478,21 +504,33 @@
 
 /* Responsive Design */
 @media (max-width: 1400px) {
-    .movies-container {
-        grid-template-columns: repeat(5, 1fr);
+    .movie-card {
+        height: calc((100vh - 300px) / 2);
+        min-height: 280px;
     }
 }
 
 @media (max-width: 1200px) {
     .movies-container {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
+    }
+    
+    .movie-card {
+        height: calc((100vh - 280px) / 2);
+        min-height: 260px;
     }
 }
 
 @media (max-width: 991px) {
     .movies-container {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+    }
+    
+    .movie-card {
+        height: calc((100vh - 260px) / 2);
+        min-height: 240px;
     }
 }
 
@@ -539,21 +577,18 @@
     }
     
     .movies-container {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 15px;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto;
+        gap: 10px;
     }
     
-    .movie-info h3 {
-        font-size: 14px;
+    .movie-card {
+        height: calc((100vh - 250px) / 3);
+        min-height: 220px;
     }
     
-    .genres-badges {
-        gap: 4px;
-    }
-    
-    .genre-badge {
-        font-size: 10px;
-        padding: 3px 6px;
+    .movie-image {
+        height: 70%;
     }
 }
 
@@ -564,6 +599,25 @@
     
     .movies-container {
         grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        gap: 8px;
     }
+    
+    .movie-card {
+        height: calc((100vh - 230px) / 3);
+        min-height: 200px;
+    }
+    
+    .movie-image {
+        height: 65%;
+    }
+    
+    .genre-badge-more {
+        font-size: 7px;
+        padding: 1px 3px;
+    }
+}
+
+/* Thêm style để đảm bảo hiển thị đồng nhất */
+.movies-row {
+    margin-bottom: 20px;
 } 
