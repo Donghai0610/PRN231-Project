@@ -6,8 +6,8 @@ const getUsers = async () => {
 }
 
 
-const UpdateActiveUser = async (id, data) => {
-  const response = await axiosInstance.put(`/api/User/${id}/isActive`, data);
+const UpdateActiveUser = async (id, isActive) => {
+  const response = await axiosInstance.put(`/api/User/${id}/isActive`, isActive);
   return response.data;
 }
 

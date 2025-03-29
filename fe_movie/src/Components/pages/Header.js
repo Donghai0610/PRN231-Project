@@ -4,6 +4,7 @@ import { Container, Row, Col, Navbar, Nav, Button } from "react-bootstrap";
 import "../../CSS/Header.css";
 import Swal from "sweetalert2";
 import { jwtDecode } from "jwt-decode";
+import { FaMoon, FaSun } from "react-icons/fa";
 
 function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -11,6 +12,9 @@ function Header() {
   const [role, setRole] = useState("");
   const [greeting, setGreeting] = useState("");
   const [userId, setUserId] = useState("");
+  const [darkMode, setDarkMode] = useState(
+    localStorage.getItem("darkMode") === "true"
+  );
   const location = useLocation();
 
   const updateUserData = () => {
@@ -23,7 +27,6 @@ function Header() {
       setUsername(account);
       setRole(decodedToken.role);
       setUserId(decodedToken.nameid);
-
     } else {
       setIsLoggedIn(false);
       setUsername("");
@@ -55,6 +58,21 @@ function Header() {
     }, 100);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    // Áp dụng dark mode cho toàn bộ trang web
+    if (darkMode) {
+      document.body.classList.add("dark-mode");
+      localStorage.setItem("darkMode", "true");
+    } else {
+      document.body.classList.remove("dark-mode");
+      localStorage.setItem("darkMode", "false");
+    }
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
   const handleLogout = () => {
     Swal.fire({
@@ -88,8 +106,19 @@ function Header() {
 
   return (
     <>
-      <Container fluid className="bg-black">
-        <Row className="d-flex justify-content-end py-2">
+      <Container fluid className={`${darkMode ? 'bg-dark' : 'bg-black'}`}>
+        <Row className="d-flex justify-content-between py-2 align-items-center">
+          <Col xs="auto" className="text-white d-flex align-items-center">
+            <Button
+              variant={darkMode ? "light" : "dark"}
+              size="sm"
+              className="theme-toggle-btn"
+              onClick={toggleDarkMode}
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? <FaSun /> : <FaMoon />}
+            </Button>
+          </Col>
           {isLoggedIn ? (
             <Col className="text-right text-white Sig">
               <Link to={`/profile/${userId}`} className="text-white text-decoration-none">
@@ -120,7 +149,7 @@ function Header() {
 
       <Navbar
         expand="lg"
-        className="bg-white border-bottom"
+        className={`${darkMode ? 'navbar-dark bg-dark' : 'navbar-light bg-white'} border-bottom`}
         style={{ marginBottom: "0px" }}
       >
         <Container style={{ marginBottom: "0px" }}>
