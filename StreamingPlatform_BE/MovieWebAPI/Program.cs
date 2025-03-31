@@ -5,6 +5,7 @@ using BusinesObjects.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -28,7 +29,11 @@ modelBuilder.EntitySet<Blog>("Blog");
 modelBuilder.EntitySet<AppUser>("AppUser");
 modelBuilder.EntitySet<Genre>("Genre");
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(config =>
+{
+    config.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
