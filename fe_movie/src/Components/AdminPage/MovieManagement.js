@@ -22,7 +22,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { FaEdit, FaTrashAlt, FaPlus, FaSearch, FaTicketAlt } from "react-icons/fa";
+import { FaEdit, FaTrashAlt, FaPlus, FaSearch, FaTicketAlt, FaRedo } from "react-icons/fa";
 import Genre_Services from "../../services/genre";
 import Movie_Service from "../../services/movie";
 import axiosInstance from "../../services/axios";
@@ -219,11 +219,17 @@ const MovieManagement = () => {
           movie.movieId === editMovie.movieId ? { ...updatedResponse, movieId: editMovie.movieId } : movie
         ));
         toast.success("Đã cập nhật phim thành công!");
+        setInterval(() => {
+          window.location.reload();
+        }, 1000);
       } else {
         // Thêm phim mới
         const createdMovie = await Movie_Service.CreateMovie(updatedMovieData);
         setMovies([...movies, createdMovie]);
         toast.success("Đã thêm phim mới thành công!");
+        setInterval(() => {
+          window.location.reload();
+        }, 1000);
       }
 
       setShowModal(false);
@@ -421,15 +427,7 @@ const MovieManagement = () => {
         >
           Tìm Kiếm
         </Button>
-
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<FaSearch />}
-          onClick={handleSearch} // Chỉ gọi khi nhấn nút tìm kiếm
-        >
-          Tìm Kiếm
-        </Button>
+        
         <Button
           variant="contained"
           color="primary"
@@ -437,6 +435,21 @@ const MovieManagement = () => {
           onClick={handleAdd}
         >
           Thêm Phim Mới
+        </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          startIcon={<FaRedo />}
+          onClick={() => {
+            // Reset tất cả các trường về rỗng
+            setSearch({ movieName: "", genre: "", actor: "" });
+            // Tải lại danh sách phim mà không có bộ lọc
+            loadMovies(0, rowsPerPage);
+            // Reset trang về 0
+            setPage(0);
+          }}
+        >
+          Xóa Bộ Lọc
         </Button>
       </Box>
 

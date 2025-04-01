@@ -15,7 +15,7 @@ const ResetPassword = () => {
 
     // Lấy token và email từ URL search params
     const searchParams = new URLSearchParams(location.search);
-    const token = searchParams.get('token');
+    const token = searchParams.get('token')?.replace(/ /g, '+');
     const email = searchParams.get('email');
 
     useEffect(() => {

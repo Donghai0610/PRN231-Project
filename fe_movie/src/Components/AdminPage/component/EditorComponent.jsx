@@ -23,112 +23,121 @@ const AI_API_KEY = 'AIzaSyC11EjCxTVy5bYGi8xspcIN5sKUIQn5KkI';
 const CLOUD_SERVICES_TOKEN_URL =
 	'https://z7z84bz822nt.cke-cs.com/token/dev/3bd5a8bcdd0c28369302d6dbe4bb6609994e15f90c188d6eb0e88431b4a5?limit=10';
 
-	export default function EditorComponent({ content, setContent }) {
-		const editorContainerRef = useRef(null);
-		const editorRef = useRef(null);
-		const editorWordCountRef = useRef(null);
-		const [isLayoutReady, setIsLayoutReady] = useState(false);
-		const cloud = useCKEditorCloud({ version: '44.3.0', premium: true, translations: ['vi'], ckbox: { version: '2.6.1' } });
+export default function EditorComponent({ content, setContent }) {
+	const editorContainerRef = useRef(null);
+	const editorRef = useRef(null);
+	const editorWordCountRef = useRef(null);
+	const editorInstanceRef = useRef(null);
+	const [isLayoutReady, setIsLayoutReady] = useState(false);
+	const cloud = useCKEditorCloud({ version: '44.3.0', premium: true, translations: ['vi'], ckbox: { version: '2.6.1' } });
 	
-		useEffect(() => {
-			setIsLayoutReady(true);
-	
-			return () => setIsLayoutReady(false);
-		}, []);
-	
-		const { ClassicEditor, editorConfig } = useMemo(() => {
-			if (cloud.status !== 'success' || !isLayoutReady) {
-				return {};
-			}
-	
-			const {
-				ClassicEditor,
-				Autoformat,
-				AutoImage,
-				Autosave,
-				BalloonToolbar,
-				BlockQuote,
-				BlockToolbar,
-				Bold,
-				CKBox,
-				CKBoxImageEdit,
-				CloudServices,
-				Emoji,
-				Essentials,
-				Heading,
-				ImageBlock,
-				ImageCaption,
-				ImageInline,
-				ImageInsert,
-				ImageInsertViaUrl,
-				ImageResize,
-				ImageStyle,
-				ImageTextAlternative,
-				ImageToolbar,
-				ImageUpload,
-				Indent,
-				IndentBlock,
-				Italic,
-				Link,
-				LinkImage,
-				List,
-				ListProperties,
-				MediaEmbed,
-				Mention,
-				Paragraph,
-				PasteFromOffice,
-				PictureEditing,
-				Table,
-				TableCaption,
-				TableCellProperties,
-				TableColumnResize,
-				TableProperties,
-				TableToolbar,
-				TextPartLanguage,
-				TextTransformation,
-				Title,
-				TodoList,
-				Underline,
-				WordCount
-			} = cloud.CKEditor;
-	
-			return {
-				ClassicEditor,
-				editorConfig: {
-					toolbar: {
-						items: [
-							'bold', 'italic', 'underline', 'link', 'insertImage', 'mediaEmbed', 'bulletedList', 'numberedList', 'blockQuote', 'insertTable', 'undo', 'redo'
-						],
-						shouldNotGroupWhenFull: false
-					},
-					plugins: [
-						Autoformat, AutoImage, Autosave, BlockQuote, Bold, CloudServices, Emoji, Essentials, Heading, ImageBlock, ImageCaption, 
-						ImageInline, ImageInsert, ImageInsertViaUrl, ImageResize, ImageStyle, ImageTextAlternative, ImageToolbar, ImageUpload, 
-						Indent, IndentBlock, Italic, Link, LinkImage, List, ListProperties, MediaEmbed, Mention, Paragraph, PictureEditing, Table, 
-						TableCaption, TableCellProperties, TableColumnResize, TableProperties, TableToolbar, TextPartLanguage, TextTransformation, 
-						Title, TodoList, Underline, WordCount
+	// Track if content was loaded into editor
+	const [contentLoaded, setContentLoaded] = useState(false);
+
+	useEffect(() => {
+		setIsLayoutReady(true);
+
+		return () => setIsLayoutReady(false);
+	}, []);
+
+	// Effect to update editor content when content prop changes
+	useEffect(() => {
+		if (editorInstanceRef.current && content && !contentLoaded) {
+			editorInstanceRef.current.setData(content);
+			setContentLoaded(true);
+		}
+	}, [content, editorInstanceRef.current, contentLoaded]);
+
+	const { ClassicEditor, editorConfig } = useMemo(() => {
+		if (cloud.status !== 'success' || !isLayoutReady) {
+			return {};
+		}
+
+		const {
+			ClassicEditor,
+			Autoformat,
+			AutoImage,
+			Autosave,
+			BlockQuote,
+			Bold,
+			CloudServices,
+			Essentials,
+			Heading,
+			Image,
+			ImageBlock,
+			ImageCaption,
+			ImageStyle,
+			ImageToolbar,
+			ImageUpload,
+			Indent,
+			Italic,
+			Link,
+			List,
+			MediaEmbed,
+			Paragraph,
+			PasteFromOffice,
+			Table,
+			TableToolbar,
+			TextTransformation,
+			Underline,
+			WordCount
+		} = cloud.CKEditor;
+
+		return {
+			ClassicEditor,
+			editorConfig: {
+				toolbar: {
+					items: [
+						'heading', '|',
+						'bold', 'italic', 'underline', '|',
+						'link', 'insertImage', 'mediaEmbed', '|',
+						'bulletedList', 'numberedList', '|',
+						'outdent', 'indent', '|',
+						'blockQuote', 'insertTable', '|',
+						'undo', 'redo'
 					],
-					cloudServices: {
-						tokenUrl: CLOUD_SERVICES_TOKEN_URL
-					},
-					initialData: content,
-					language: 'vi',
-					licenseKey: LICENSE_KEY,
-					placeholder: 'Type or paste your content here!',
-				}
-			};
-		}, [cloud, isLayoutReady]);
-	
-		useEffect(() => {
-			if (editorConfig) {
-				configUpdateAlert(editorConfig);
+					shouldNotGroupWhenFull: true
+				},
+				plugins: [
+					Autoformat, AutoImage, Autosave, BlockQuote, Bold, CloudServices, Essentials, 
+					Heading, Image, ImageBlock, ImageCaption, ImageStyle, ImageToolbar, ImageUpload,
+					Indent, Italic, Link, List, MediaEmbed, Paragraph, PasteFromOffice,
+					Table, TableToolbar, TextTransformation, Underline, WordCount
+				],
+				cloudServices: {
+					tokenUrl: CLOUD_SERVICES_TOKEN_URL
+				},
+				image: {
+					toolbar: [
+						'imageStyle:inline',
+						'imageStyle:block',
+						'imageStyle:side',
+						'|',
+						'toggleImageCaption',
+						'imageTextAlternative'
+					]
+				},
+				table: {
+					contentToolbar: [
+						'tableColumn',
+						'tableRow',
+						'mergeTableCells'
+					]
+				},
+				initialData: content || '', // Set initial data from props
+				language: 'vi',
+				licenseKey: LICENSE_KEY,
+				placeholder: 'Nhập nội dung bài viết vào đây...',
 			}
-		}, [editorConfig]);
-	
-		return (
-			<div className="main-container">
+		};
+	}, [cloud, isLayoutReady, content]);
+
+	return (
+		<div className="main-container">
+			<div className="editor-wrapper">
+				<label className="editor-label">Nội dung</label>
 				<div
-					className="editor-container editor-container_classic-editor editor-container_include-block-toolbar editor-container_include-word-count"
+					className="editor-container editor-container_classic-editor"
 					ref={editorContainerRef}
 				>
 					<div className="editor-container__editor">
@@ -136,12 +145,21 @@ const CLOUD_SERVICES_TOKEN_URL =
 							{ClassicEditor && editorConfig && (
 								<CKEditor
 									onReady={editor => {
+										editorInstanceRef.current = editor;
 										const wordCount = editor.plugins.get('WordCount');
-										editorWordCountRef.current.appendChild(wordCount.wordCountContainer);
+										if (wordCount && editorWordCountRef.current) {
+											editorWordCountRef.current.appendChild(wordCount.wordCountContainer);
+										}
+										
+										// Set initial content if available
+										if (content && !contentLoaded) {
+											editor.setData(content);
+											setContentLoaded(true);
+										}
 									}}
 									onChange={(event, editor) => {
-										const data = editor.getData(); // Get the HTML content from CKEditor
-										setContent(data);  // Set content in the parent component (AddBlog)
+										const data = editor.getData();
+										setContent(data);
 									}}
 									editor={ClassicEditor}
 									config={editorConfig}
@@ -149,36 +167,37 @@ const CLOUD_SERVICES_TOKEN_URL =
 							)}
 						</div>
 					</div>
-					<div className="editor_container__word-count" ref={editorWordCountRef}></div>
+					<div className="editor-word-count" ref={editorWordCountRef}></div>
 				</div>
 			</div>
+		</div>
+	);
+}
+
+/**
+ * This function exists to remind you to update the config needed for premium features.
+ * The function can be safely removed. Make sure to also remove call to this function when doing so.
+ */
+function configUpdateAlert(config) {
+	if (configUpdateAlert.configUpdateAlertShown) {
+		return;
+	}
+
+	const valuesToUpdate = [];
+	configUpdateAlert.configUpdateAlertShown = true;
+
+	if (!config.licenseKey) {
+		valuesToUpdate.push('LICENSE_KEY');
+	}
+
+	if (valuesToUpdate.length) {
+		window.alert(
+			[
+				'Please update the following values in your editor config',
+				'to receive full access to Premium Features:',
+				'',
+				...valuesToUpdate.map(value => ` - ${value}`)
+			].join('\n')
 		);
 	}
-	
-	/**
-	 * This function exists to remind you to update the config needed for premium features.
-	 * The function can be safely removed. Make sure to also remove call to this function when doing so.
-	 */
-	function configUpdateAlert(config) {
-		if (configUpdateAlert.configUpdateAlertShown) {
-			return;
-		}
-	
-		const valuesToUpdate = [];
-		configUpdateAlert.configUpdateAlertShown = true;
-	
-		if (!config.licenseKey) {
-			valuesToUpdate.push('LICENSE_KEY');
-		}
-	
-		if (valuesToUpdate.length) {
-			window.alert(
-				[
-					'Please update the following values in your editor config',
-					'to receive full access to Premium Features:',
-					'',
-					...valuesToUpdate.map(value => ` - ${value}`)
-				].join('\n')
-			);
-		}
-	}
+}

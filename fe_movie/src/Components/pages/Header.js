@@ -102,6 +102,7 @@ function Header() {
     setUsername("");
     setRole("");
     setUserId("");
+    window.location.replace("/");
   };
 
 

@@ -153,6 +153,7 @@ function App() {
           path="/"
           element={<PrivateRoute element={<HomePage />} allowedRoles={["Admin", "Customer"]} />}
         />
+      
         <Route
           path="/movie/:id"
           element={<PrivateRoute element={<MovieDetail />} allowedRoles={["Admin", "Customer"]} />}

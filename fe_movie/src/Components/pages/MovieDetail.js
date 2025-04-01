@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { FaFacebookF, FaPlay, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { Modal } from "react-bootstrap";
@@ -9,6 +9,7 @@ const MovieDetail = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const castListRef = useRef(null);
 
   useEffect(() => {
     const fetchMovieDetail = async () => {
@@ -45,6 +46,21 @@ const MovieDetail = () => {
   };
 
   const videoId = movie.movieUrl ? getYouTubeVideoId(movie.movieUrl) : null;
+
+  // Slide navigation functions
+  const scrollAmount = 200; // Adjust this value based on your needs
+
+  const handlePrevClick = () => {
+    if (castListRef.current) {
+      castListRef.current.scrollLeft -= scrollAmount;
+    }
+  };
+
+  const handleNextClick = () => {
+    if (castListRef.current) {
+      castListRef.current.scrollLeft += scrollAmount;
+    }
+  };
 
   return (
     <div className="movie-detail-container">
@@ -93,10 +109,10 @@ const MovieDetail = () => {
           <div className="cast-section">
             <h2>DIỄN VIÊN</h2>
             <div className="cast-list-container">
-              <button className="cast-nav-btn prev">
+              <button className="cast-nav-btn prev" onClick={handlePrevClick}>
                 <FaChevronLeft />
               </button>
-              <div className="cast-list">
+              <div className="cast-list" ref={castListRef}>
                 {movie.actors.map((actor) => (
                   <div key={actor.actorId} className="cast-member">
                     <div className="cast-image">
@@ -109,7 +125,7 @@ const MovieDetail = () => {
                   </div>
                 ))}
               </div>
-              <button className="cast-nav-btn next">
+              <button className="cast-nav-btn next" onClick={handleNextClick}>
                 <FaChevronRight />
               </button>
             </div>
@@ -140,20 +156,25 @@ const MovieDetail = () => {
         {/* Season content will be added later */}
       </div>
 
-      <Modal show={showModal} onHide={handleCloseModal} size="lg" centered>
+      <Modal 
+        show={showModal} 
+        onHide={handleCloseModal}
+        size="xl"
+        contentClassName="video-modal-content"
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>{movie.movieName}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="video-modal-body">
           <div className="video-container">
             {videoId && (
               <iframe
-                width="100%"
-                height="480"
-                src={`https://www.youtube.com/embed/${videoId}`}
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
                 frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 allowFullScreen
+                title={`${movie.movieName} trailer`}
               ></iframe>
             )}
           </div>
