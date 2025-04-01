@@ -114,6 +114,10 @@ const ActorManagement = () => {
       setValidationError("");
       toast.success("Thêm diễn viên thành công!");
       setError(null);
+      setInterval(() => {
+
+      window.location.reload(); 
+      }, 1000);
     } catch (error) {
       setValidationError("Không thể thêm diễn viên. Vui lòng thử lại!");
       toast.error("Không thể thêm diễn viên!");
