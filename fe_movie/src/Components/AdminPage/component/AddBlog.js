@@ -118,7 +118,9 @@ const AddBlog = () => {
 
         
       {/* CKEditor for Content */}
-      <EditorComponent  content={content} setContent={handleEditorChange} />
+      <div className="editor-container-wrapper">
+        <EditorComponent content={content} setContent={handleEditorChange} />
+      </div>
 
       <Button
         variant="contained"
